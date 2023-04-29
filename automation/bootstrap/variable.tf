@@ -37,3 +37,16 @@ variable "git-repo"{
   description = "Git repository address. https format"
   default = "https://github.com/yugabyte/yb-demo-tradex-2.0.git"
 }
+
+variable "tags"{
+  type = map(string)
+  description = "Defautl tags for resources"
+  default = {
+    yb-owner    = "yrampuria"
+    yb-customer = "internal"
+    yb-task     = "demo"
+    yb-dept     = "sales"
+    yb-env      = "demo"
+    yb-project  = "demo-tradex"
+  }
+}
