@@ -8,3 +8,7 @@ output "app-vm" {
 output "sg" {
   value = aws_security_group.sg.id
 }
+
+output "region" {
+  value = data.aws_region.current.name
+}
