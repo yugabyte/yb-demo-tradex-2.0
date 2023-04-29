@@ -43,3 +43,41 @@ module "geo-partition-universe" {
   universe-name = var.yba.geo-partition-universe-name
 }
 
+locals {
+  db-map = {
+    sr = {
+      title = "Single Region"
+      module = module.single-region-universe
+      dns = {
+        all = one(aws_route53_record.single-region[*])
+        nodes = aws_route53_record.single-region-nodes[*]
+      }
+    }
+    mr = {
+      title = "Multi Region"
+      module = module.multi-region-universe
+      dns = {
+        all = one(aws_route53_record.multi-region[*])
+        nodes = aws_route53_record.multi-region-nodes[*]
+      }
+    }
+    mrrr = {
+      title = "Multi Region with Read Replica"
+      module = module.multi-region-read-replica-universe
+      dns = {
+        all = one(aws_route53_record.multi-region-read-replica[*])
+        nodes = aws_route53_record.multi-region-read-replica-nodes[*]
+        rr = one(aws_route53_record.multi-region-read-replica-rr[*])
+        rr-nodes = aws_route53_record.multi-region-read-replica-rr-nodes[*]
+      }
+    }
+    gp = {
+      title = "Geo Partitioned"
+      module = module.geo-partition-universe
+      dns = {
+        all = one(aws_route53_record.geopart[*])
+        nodes = aws_route53_record.geopart-nodes[*]
+      }
+    }
+  }
+}
