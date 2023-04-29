@@ -1,6 +1,12 @@
 output "universe"{
   value = local.universe
 }
+output "name"{
+  value = local.name
+}
+output "universeUUID" {
+  value = local.universeUUID
+}
 output "primary-tservers" {
   value = local.primary-tservers
 }
