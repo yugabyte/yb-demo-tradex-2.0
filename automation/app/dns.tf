@@ -16,12 +16,12 @@ locals {
   geo-ips     = module.geo-partition-universe.primary-tservers-ips
 }
 resource "aws_route53_record" "regional-app" {
-  for_each = local.vm-ips
+  for_each = local.regional-resources
   zone_id  = data.aws_route53_zone.root.id
   name     = "${each.key}-${local.app-dns-suffix}"
   type     = "A"
   ttl      = "5"
-  records  = [each.value]
+  records  = [each.value.ip]
 }
 
 resource "aws_route53_record" "single-region" {
