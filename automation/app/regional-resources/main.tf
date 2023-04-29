@@ -7,11 +7,12 @@ terraform {
 }
 
 data "aws_vpc" "vpc" {
-  id = var.vpc_id  
+  id = var.vpc_id
 }
 data "aws_availability_zones" "available" {
   state = "available"
 }
+data "aws_region" "current" {}
 
 data "aws_subnets" "public-subnets" {
   filter {
@@ -93,11 +94,11 @@ resource "aws_instance" "app" {
   # associate_public_ip_address = true
   instance_type = var.machine-size
   key_name = aws_key_pair.ssh-key.key_name
-  
+  iam_instance_profile   = var.instance-profile
+
   vpc_security_group_ids = [
     aws_security_group.sg.id
   ]
   subnet_id = data.aws_subnets.private-subnets.ids[0]
   user_data = data.cloudinit_config.server_config.rendered
 }
-
