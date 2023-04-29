@@ -10,7 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Base tools
 apt-get update
-apt-get install -qqy apt-transport-https ca-certificates curl gnupg-agent software-properties-common lsb-release unattended-upgrades git wget direnv openjdk-17-jdk-headless maven python-is-python3 unzip
+apt-get install -qqy apt-transport-https ca-certificates curl gnupg-agent software-properties-common lsb-release unattended-upgrades git wget direnv openjdk-17-jdk-headless maven python-is-python3 unzip net-tools
 
 # Add docker repo
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
