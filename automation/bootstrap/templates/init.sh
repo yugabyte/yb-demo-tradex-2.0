@@ -47,6 +47,10 @@ rm awscliv2.zip
 ./aws/install
 rm -rf aws
 
+curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+sudo dpkg -i session-manager-plugin.deb
+rm session-manager-plugin.deb
+
 # Install yb_stats
 wget -q 'https://github.com/fritshoogland-yugabyte/yb_stats/releases/download/v0.9.8/yb-stats_0.9.8_amd64.deb'
 apt-get install -qqy ./yb-stats_0.9.8_amd64.deb
