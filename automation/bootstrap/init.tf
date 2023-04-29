@@ -21,11 +21,7 @@ terraform {
 provider "aws" {
   # region = "us-east-2"
   default_tags {
-    tags = {
-      yb-project = "demo-tradex"
-      yb-owner   = "yrampuria"
-
-    }
+    tags = var.tags
   }
 }
 
