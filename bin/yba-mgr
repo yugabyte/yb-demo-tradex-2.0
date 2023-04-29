@@ -15,15 +15,14 @@ warnings.filterwarnings(
 # API endpoint
 YW_HOST = os.environ.get("YW_HOST","localhost")
 YW_API = f"https://{YW_HOST}/api/v1"
+YW_API_TOKEN = os.environ.get( "YW_API_TOKEN", None )
 # Authentication token
 headers = {
     "Accept": "application/json",
     "Content-Type": "application/json;charset=UTF-8",
-    "X-AUTH-YW-API-TOKEN": os.environ.get(
-        "YW_API_TOKEN", "95cbbd55-67fb-4f09-8de2-1af193c11f93"
-    ),
+    "X-AUTH-YW-API-TOKEN": YW_API_TOKEN,
 }
-YW_CUST_ID = None
+YW_CUST_ID = os.environ.get( "YW_CUST_ID", None )
 
 
 def main():
@@ -114,7 +113,7 @@ def select_universe(universe_list):
 
 def process_arguments():
     parser = argparse.ArgumentParser(
-        prog="ybamg",
+        prog="yba-mgr",
         description= "Manage YB Universes",
         epilog="YMMW, Use at your own risk"
     )
