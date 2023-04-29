@@ -69,7 +69,7 @@ resource "aws_security_group" "sg" {
 resource "aws_ebs_volume" "jumpbox-data" {
   availability_zone = data.aws_availability_zone.az.name
   size              = 40
-  type = "gp3"
+  type              = "gp3"
 
   tags = {
     Name = "${local.prefix}-jumbox-data"
@@ -81,7 +81,7 @@ data "cloudinit_config" "config" {
 
   part {
     content_type = "text/cloud-config"
-    content      = templatefile("${path.module}/templates/cloud-init.yaml", {
+    content = templatefile("${path.module}/templates/cloud-init.yaml", {
     })
   }
   part {
@@ -92,7 +92,7 @@ data "cloudinit_config" "config" {
   part {
     content_type = "text/x-shellscript"
     filename     = "setup-code.sh"
-    content      = templatefile("${path.module}/templates/setup-code.sh", {
+    content = templatefile("${path.module}/templates/setup-code.sh", {
       git_repo = var.git-repo
     })
   }
@@ -129,9 +129,9 @@ SSHCONFIG
 }
 
 resource "local_file" "ssh-host-alias-config" {
-  count = var.create-ssh-host-alias-file? 1: 0
-  content = local.ssh-host-alias-config
-  filename = "${local.ssh-host-alias-file-location}/${local.prefix}-jumpbox"
+  count           = var.create-ssh-host-alias-file ? 1 : 0
+  content         = local.ssh-host-alias-config
+  filename        = "${local.ssh-host-alias-file-location}/${local.prefix}-jumpbox"
   file_permission = 0600
 }
 

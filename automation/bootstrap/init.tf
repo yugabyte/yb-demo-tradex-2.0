@@ -27,15 +27,15 @@ provider "aws" {
 
 
 locals {
-  vpc_id    = var.vpc-id
-  subnet_id = var.subnet-id
-  prefix    = var.prefix
-  aws-profile = var.aws-profile
+  vpc_id                       = var.vpc-id
+  subnet_id                    = var.subnet-id
+  prefix                       = var.prefix
+  aws-profile                  = var.aws-profile
   ssh-host-alias-file-location = pathexpand(var.ssh-host-alias-file-location)
 }
 
 
-data "aws_region" "region"{
+data "aws_region" "region" {
 }
 
 data "aws_subnet" "subnet" {

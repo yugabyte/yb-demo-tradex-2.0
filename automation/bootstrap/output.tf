@@ -24,7 +24,7 @@ SSH over SSM          : ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyC
 
 SSH
 ----
-Host Alias            : ${ var.create-ssh-host-alias-file ?  "${local.prefix}-jumpbox" : "<Undefined>" }
+Host Alias            : ${var.create-ssh-host-alias-file ? "${local.prefix}-jumpbox" : "<Undefined>"}
 Host Alias Config     : (for manual alias creation. Add to ~/.ssh/config)
 ${local.ssh-host-alias-config}
 Connect               : ssh ${local.prefix}-jumpbox
