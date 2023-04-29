@@ -16,6 +16,15 @@ variable "vpc-mapping" {
 variable "tags" {
   type        = map(string)
   description = "Tags associated with the env"
+  default =  {
+    yb-owner    = "yrampuria"
+    yb-customer = "internal"
+    yb-task     = "demo"
+    yb-dept     = "sales"
+    yb-env      = "demo"
+    yb-project  = "demo-tradex"
+
+  }
 }
 
 variable "root-domain" {
