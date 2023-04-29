@@ -35,5 +35,5 @@ variable "create-ssh-host-alias-file" {
 variable "git-repo"{
   type = string
   description = "Git repository address. https format"
-  default = "git://github.com/yugabyte/yb-demo-tradex-v2.0.git"
+  default = "https://github.com/yugabyte/yb-demo-tradex-2.0.git"
 }
