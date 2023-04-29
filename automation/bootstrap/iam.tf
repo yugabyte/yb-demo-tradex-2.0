@@ -1,25 +1,3 @@
-
-
-resource "aws_iam_policy" "policy" {
-  name        = "${local.prefix}-policy"
-  description = "${local.prefix} Jumpbox Customer Policy"
-  policy      = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "Admin",
-        "Effect" : "Allow",
-        "Action" : [
-          "route53:*",
-          "iam:*",
-          "ec2:*",
-        ],
-        "Resource" : "*"
-      }
-    ]
-  })
-}
-
 resource "aws_iam_role" "role" {
   name = "${local.prefix}-role"
 
@@ -27,8 +5,7 @@ resource "aws_iam_role" "role" {
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
     "arn:aws:iam::aws:policy/AmazonSSMPatchAssociation",
-    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-    aws_iam_policy.policy.arn
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess"
   ]
 
   assume_role_policy = jsonencode({
