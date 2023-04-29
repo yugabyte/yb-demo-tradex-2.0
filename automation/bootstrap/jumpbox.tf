@@ -89,13 +89,13 @@ data "cloudinit_config" "config" {
     filename     = "init.sh"
     content      = file("${path.module}/templates/init.sh")
   }
-  # part {
-  #   content_type = "text/x-shellscript"
-  #   filename     = "setup-code.sh"
-  #   content      = templatefile("${path.module}/templates/setup-code.sh", {
-  #     git_repo = var.git-repo
-  #   })
-  # }
+  part {
+    content_type = "text/x-shellscript"
+    filename     = "setup-code.sh"
+    content      = templatefile("${path.module}/templates/setup-code.sh", {
+      git_repo = var.git-repo
+    })
+  }
 }
 
 resource "aws_instance" "jumpbox" {
