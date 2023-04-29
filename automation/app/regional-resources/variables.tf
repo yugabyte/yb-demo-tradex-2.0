@@ -68,3 +68,8 @@ variable "tradex-env" {
   type = string
   description = "Environment variables file"
 }
+
+variable "instance-profile" {
+  type = string
+  description = "Instance profile for VMs"
+}
