@@ -10,7 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Base tools
 apt-get update
-apt-get install -qqy apt-transport-https ca-certificates curl gnupg-agent software-properties-common lsb-release unattended-upgrades git wget direnv openjdk-17-jdk-headless maven python-is-python3 unzip net-tools
+apt-get install -qqy apt-transport-https ca-certificates curl gnupg-agent software-properties-common lsb-release unattended-upgrades git wget openjdk-17-jdk-headless maven python-is-python3 unzip net-tools
 
 # Add docker repo
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -24,11 +24,18 @@ echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://a
 curl -fsSL https://baltocdn.com/helm/signing.asc | gpg --dearmor -o /usr/share/keyrings/helm.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
 
+# Add terraform repo
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
 # Install tools
 apt-get update
-apt-get install -qqy kubectl helm docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+apt-get install -qqy kubectl helm docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin terraform
 
 usermod -aG docker ubuntu
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
 
 # Isntall k9s
 curl -fsSL https://github.com/derailed/k9s/releases/download/v0.27.3/k9s_Linux_amd64.tar.gz | tar -C /usr/local/bin -xz k9s
@@ -69,3 +76,7 @@ mkdir -p /home/ubuntu/.ssh/configs
 touch /home/ubuntu/.ssh/config
 echo "Include configs/*" >> /home/ubuntu/.ssh/config
 chown  -R ubuntu:ubuntu /home/ubuntu/.ssh
+
+# Setup Direnv
+curl -sfL https://direnv.net/install.sh | bash
+echo 'eval "$(direnv hook bash)"' >> /home/ubuntu/.bashrc
