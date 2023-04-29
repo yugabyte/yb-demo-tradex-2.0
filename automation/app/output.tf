@@ -36,53 +36,33 @@ Stop App VMs
 %{for location, res in local.regional-resources~}
 aws ec2 stop-instances --instance-ids ${res.instance-id} --region ${res.region}
 %{endfor~}
+
 Database DNS:
 -------------
+%{for k, u in local.db-map~}
 
-  Single Region Multi Zone
-    %{for db-dns in aws_route53_record.single-region[*]~}
-    ${db-dns.name} -> ${join(",", db-dns.records)}
-    %{endfor~}
+${u.title}
+  Name: ${u.module.name}
+  UUID: ${u.module.universeUUID}
 
-    %{for db-dns in aws_route53_record.single-region-nodes[*]~}
-    ${db-dns.name} -> ${join(",", db-dns.records)} (${module.single-region-universe.nodes-topology-map[join("", db-dns.records)]})
-    %{endfor~}
+  ${u.dns.all.name} -> ${join(",", u.dns.all.records)}
 
-  Multi Region
-    %{for db-dns in aws_route53_record.multi-region[*]~}
-    ${db-dns.name} -> ${join(",", db-dns.records)}
-    %{endfor~}
+  %{for dns in u.dns.nodes[*]~}
+  ${dns.name} -> ${join(",", dns.records)} (${u.module.nodes-topology-map[join("", dns.records)]})
+  %{endfor~}
+  %{if contains(keys(u.dns), "rr")~}
 
-    %{for db-dns in aws_route53_record.multi-region-nodes[*]~}
-    ${db-dns.name} -> ${join(",", db-dns.records)} (${module.multi-region-universe.nodes-topology-map[join("", db-dns.records)]})
-    %{endfor~}
+  Read Replica
 
-  Multi Region Read Replicas
-    %{for db-dns in aws_route53_record.multi-region-read-replica[*]~}
-    ${db-dns.name} -> ${join(",", db-dns.records)}
-    %{endfor~}
+    ${u.dns.rr.name} -> ${join(",", u.dns.rr.records)}
 
-    %{for db-dns in aws_route53_record.multi-region-read-replica-nodes[*]~}
-    ${db-dns.name} -> ${join(",", db-dns.records)} (${module.multi-region-read-replica-universe.nodes-topology-map[join("", db-dns.records)]})
+    %{for dns in u.dns.rr-nodes[*]~}
+    ${dns.name} -> ${join(",", dns.records)} (${u.module.nodes-topology-map[join("", dns.records)]})
     %{endfor~}
-
-    Read Replica
-    %{for db-dns in aws_route53_record.multi-region-read-replica-rr[*]~}
-    ${db-dns.name} -> ${join(",", db-dns.records)}
-    %{endfor~}
-
-    %{for db-dns in aws_route53_record.multi-region-read-replica-rr-nodes[*]~}
-    ${db-dns.name} -> ${join(",", db-dns.records)} (${module.multi-region-read-replica-universe.nodes-topology-map[join("", db-dns.records)]})
-    %{endfor~}
-
-  Geo Partitioned
-    %{for db-dns in aws_route53_record.geopart[*]~}
-    ${db-dns.name} -> ${join(",", db-dns.records)}
-    %{endfor~}
-
-    %{for db-dns in aws_route53_record.geopart-nodes[*]~}
-    ${db-dns.name} -> ${join(",", db-dns.records)} (${module.geo-partition-universe.nodes-topology-map[join("", db-dns.records)]})
-    %{endfor~}
+  %{endif~}
+%{endfor~}
 
 EOF
 }
+
+
