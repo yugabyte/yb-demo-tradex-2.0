@@ -9,11 +9,11 @@ locals {
   db-dns-suffix  = "${var.env-name}-tradexdb.${data.aws_route53_zone.root.name}."
 
 
-  srmz-ips = module.single-region-universe.primary-tservers-ips
-  mr-ips   = module.multi-region-universe.primary-tservers-ips
-  mrrr-ips = module.multi-region-read-replica-universe.primary-tservers-ips
+  srmz-ips    = module.single-region-universe.primary-tservers-ips
+  mr-ips      = module.multi-region-universe.primary-tservers-ips
+  mrrr-ips    = module.multi-region-read-replica-universe.primary-tservers-ips
   mrrr-rr-ips = module.multi-region-read-replica-universe.read-replica-tservers-ips
-  geo-ips  = module.geo-partition-universe.primary-tservers-ips
+  geo-ips     = module.geo-partition-universe.primary-tservers-ips
 }
 resource "aws_route53_record" "regional-app" {
   for_each = local.vm-ips

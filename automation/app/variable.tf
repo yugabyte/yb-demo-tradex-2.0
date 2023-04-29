@@ -16,7 +16,7 @@ variable "vpc-mapping" {
 variable "tags" {
   type        = map(string)
   description = "Tags associated with the env"
-  default =  {
+  default = {
     yb-owner    = "yrampuria"
     yb-customer = "internal"
     yb-task     = "demo"
@@ -59,28 +59,28 @@ variable "yba" {
 }
 
 variable "docker-image-dev" {
-  type = string
+  type    = string
   default = "ssaranga/tradex-app-dev:latest"
 }
 
 variable "docker-image-prod" {
-  type = string
+  type    = string
   default = "ssaranga/tradex-app-final:11"
 }
 
 variable "db-name" {
-  type = string
+  type        = string
   description = "Namr of database"
-  default = "yugabyte"
+  default     = "yugabyte"
 }
 
 variable "db-user" {
-  type = string
+  type        = string
   description = "User name for all database"
-  default = "yugabyte"
+  default     = "yugabyte"
 }
 
 variable "db-password" {
-  type = string
+  type        = string
   description = "Password for all databases"
 }
