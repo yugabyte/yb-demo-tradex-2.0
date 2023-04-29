@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+    <entry key="UPDATE_APP_USER">
+        <![CDATA[
+        update app_user set email = :uemail, USER_LANGUAGE = :ulang, enabled = :uenabled,
+          personal_details = cast ( :upersonaldet as json ), user_notifications = cast ( :unotifications as json ),
+          updated_date = now() where preferred_region = :prefRegion and id = :uid
+    ]]>
+    </entry>
+    <entry key="UPDATE_APP_USER_PWD">
+        <![CDATA[
+            update app_user set passkey = :passKey where email = :uemail
+    ]]>
+    </entry>
+
+    <entry key="ADD_USER_FAV">
+        <![CDATA[
+        update app_user set favourites = array_append ( favourites, :stockId ) where preferred_region = :prefRegion and id = :uid
+    ]]>
+    </entry>
+
+    <entry key="DEL_USER_FAV">
+        <![CDATA[
+        update app_user set favourites = array_remove ( favourites, :stockId ) where preferred_region = :prefRegion and id = :uid
+    ]]>
+    </entry>
+
+    <entry key="UPDATE_USER_FAV">
+        <![CDATA[
+        update app_user set favourites = :favourites where preferred_region = :prefRegion and id = :uid
+    ]]>
+    </entry>
+
+    <entry key="UPDATE_USER_NOTIF">
+        <![CDATA[
+          update app_user set user_notifications = cast( :pNotif as json ) where preferred_region = :prefRegion and id = :uid
+    ]]>
+    </entry>
+
+    <entry key="UPDATE_USER_LANG">
+        <![CDATA[
+            update app_user set user_language = :langCode where preferred_region = :prefRegion and id = :uid
+    ]]>
+    </entry>
+
+    <entry key="FIND_BY_EMAIL_SQL">
+        <![CDATA[
+        select id, preferred_region, email, personal_details, enabled, user_notifications, user_language, created_date , updated_date , favourites, passkey, security_pin from app_user au where au.email = :pEmail
+    ]]>
+    </entry>
+
+    <entry key="EXISTS_BY_EMAIL_SQL">
+        <![CDATA[
+            select  exists ( select 1  from app_user au where au.email = :pEmail )
+    ]]>
+    </entry>
+    <entry key="VERIFY_USE_PIN_SQL">
+        <![CDATA[
+        select exists ( select 1 from app_user au where au.id = :pUserId and au.preferred_region = :prefRegion and au.security_pin = :pUserPin)
+    ]]>
+    </entry>
+
+    <entry key="FIND_BY_ID">
+        <![CDATA[
+            select * from app_user u where u.id = :uid and u.preferred_region = :prefRegion
+    ]]>
+    </entry>
+    <entry key="INSERT_APP_USER">
+        <![CDATA[
+           insert into app_user(preferred_region,email, passkey, enabled, user_language,
+          personal_details,user_notifications,security_pin, created_date,updated_date) values
+          ( :prefRegion, :uemail, :upasswd, :uenabled, :ulang, cast (:upersonaldet as json) ,
+           cast ( :unotifications as json), :usecuritypin, now(), now()) returning ID, PREFERRED_REGION
+    ]]>
+    </entry>
+
+</properties>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+    <entry key="REFDATA_BY_KEY_SQL">
+        <![CDATA[
+      select * from public.ref_data r where r.key_name = :pKeyName
+    ]]>
+    </entry>
+
+    <entry key="FETCH_DB_NODES">
+        <![CDATA[
+       select region, zone, node_type from yb_servers()
+    ]]>
+    </entry>
+
+
+</properties>

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+PROJECT_DIR=$( cd ${SCRIPT_DIR}/.. ; pwd)
+
+YW_API_TOKEN=${YW_API_TOKEN?"Environment Variable YW_API_TOKEN required"}
+YW_API=${YW_API?"Environment Variable YW_API required"}
+
+export YW_SESSION_INFO=$(curl -sSL -H 'Accept: application/json' -H 'Content-Type: application/json;charset=UTF-8' -H "X-AUTH-YW-API-TOKEN: $YW_API_TOKEN" "$YW_API/session_info" -k)
+export YW_CUST_ID=$(echo $YW_SESSION_INFO | jq -r '.customerUUID')
+export YW_USER_ID=$(echo $YW_SESSION_INFO | jq -r '.userUUID')
+
+export YW_API_CUST=https://$YW_HOST/api/v1/customers/$YW_CUST_ID
+
+curl -k -sSL -H 'Accept: application/json' -H 'Content-Type: application/json;charset=UTF-8' -H "X-AUTH-YW-API-TOKEN: $YW_API_TOKEN" "$@"

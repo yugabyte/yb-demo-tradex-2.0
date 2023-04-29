@@ -1,0 +1,114 @@
+application:
+  title: "TradeX : Trading Made Easy"
+  version: 1.0
+
+app:
+  nodehealth:
+    monitor:
+      schedule: 0,15,30,45 * * * * *
+  load_mock_data: ${APP_LOAD_MOCK_DATA:true}
+  load_balance: ${APP_DB_LOADBALANCE}
+  mylocation: ${APP_INSTANCE_LOCATION}
+  security:
+    jwt:
+      secret: cccccclvkgnllrhrngucjbivrehvjcnkfvfihildhfcg
+      expiry: 86400
+  cors:
+    max_age: 3600
+  yb:
+    api:
+      host: ${YB_API_HOST}
+      custid: ${YB_API_CUST}
+      authtoken: ${YB_API_TOKEN}
+
+  srmz-db:
+    username: ${APP_SINGLE_DB_USER}
+    password: ${APP_SINGLE_DB_PWD}
+    jdbcUrl: ${APP_SINGLE_DB_URL}
+
+    topology-keys: ${APP_SINGLE_DB_TP_KEYS}
+
+  mrmz-db:
+    username: ${APP_MULTI_REGION_DB_USER}
+    password: ${APP_MULTI_REGION_DB_PWD}
+    jdbcUrl: ${APP_MULTI_REGION_DB_URL}
+
+    topology-keys: ${APP_MULTI_REGION_DB_TP_KEYS}
+
+  mrrr-db:
+    username: ${APP_MULTI_REGION_READ_REPLICA_DB_USER}
+    password: ${APP_MULTI_REGION_READ_REPLICA_DB_PWD}
+    jdbcUrl: ${APP_MULTI_REGION_READ_REPLICA_DB_URL}
+
+    topology-keys: ${APP_MULTI_REGION_READ_REPLICA_DB_TP_KEYS}
+
+  geo-db:
+    username: ${APP_GEO_PART_DB_USER}
+    password: ${APP_GEO_PART_DB_PWD}
+    jdbcUrl: ${APP_GEO_PART_DB_URL}
+    topology-keys: ${APP_GEO_PART_DB_TP_KEYS}
+
+
+spring:
+  application:
+    name: trading-api
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        connection:
+          provider_disables_autocommit: true
+        default_schema: public
+    open-in-view: false
+  thymeleaf:
+    prefix: classpath:/static/
+
+  data:
+    rest:
+      base-path: /api/v1
+  devtools:
+    livereload:
+      port: 35730
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+
+server:
+  compression:
+    enabled: true
+    mime-types: text/html,text/plain,text/xml,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+  error:
+    whitelabel:
+      enabled: false
+
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+      #    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+      springframework:
+        security: debug
+        web:
+          client: info
+        sql: DEBUG
+        cache: WARN
+    com:
+      zaxxer:
+        hikari: WARN
+      yugabyte:
+        ysql: WARN
+        samples:
+          tradex: DEBUG

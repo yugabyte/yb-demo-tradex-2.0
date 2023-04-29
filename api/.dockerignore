@@ -1,0 +1,9 @@
+.idea/
+*.iml
+*.iws
+target/classes
+.git
+.gitignore
+src
+docker_env
+app_env
