@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import json
+import requests
+import warnings
+import argparse
+
+# Suppress SSL warnings
+warnings.filterwarnings(
+    "ignore", category=requests.packages.urllib3.exceptions.InsecureRequestWarning
+)
+
+# API endpoint
+YW_HOST = os.environ.get("YW_HOST","localhost")
+YW_API = f"https://{YW_HOST}/api/v1"
+# Authentication token
+headers = {
+    "Accept": "application/json",
+    "Content-Type": "application/json;charset=UTF-8",
+    "X-AUTH-YW-API-TOKEN": os.environ.get(
+        "YW_API_TOKEN", "95cbbd55-67fb-4f09-8de2-1af193c11f93"
+    ),
+}
+YW_CUST_ID = None
+
+
+def main():
+    args = process_arguments()
+    if(args.uuid):
+        for uuid in args.uuid:
+            universe_action(uuid, args.action)
+        return
+
+    universes = get_universes()
+    if not universes:
+        print("No paused universes were found.")
+        return
+    selected_universe = select_universe(universes)
+    action = "resume" if selected_universe["universeDetails"]["universePaused"] else "pause"
+    universe_action(selected_universe["universeUUID"], action)
+
+def prepare_for_api_call():
+    global YW_CUST_ID
+    if (YW_CUST_ID != None):
+        return
+    # Get session information
+    session_info_response = requests.get(
+        f"{YW_API}/session_info", headers=headers, verify=False
+    )
+    # Extract the customer ID from the session information
+    if session_info_response.status_code == 200:
+        session_info = session_info_response.json()
+        YW_CUST_ID = session_info["customerUUID"]
+    else:
+        print("Session information request failed")
+
+def get_universes():
+    global YW_API
+    global YW_CUST_ID
+    global headers
+    # Get universes for the customer
+    prepare_for_api_call()
+    universe_response = requests.get(
+        f"{YW_API}/customers/{YW_CUST_ID}/universes", headers=headers, verify=False
+    )
+    # Extract the names of universes that are paused
+    if universe_response.status_code == 200:
+        return universe_response.json()
+    else:
+        print("Universe request failed")
+    return []
+
+def get_paused_universes():
+    universes = get_universes()
+    return  [
+        universe
+        for universe in universes if universe.get("universeDetails", {}).get("universePaused") == True
+    ]
+
+def universe_action(universe_uuid, action):
+    global YW_API
+    global YW_CUST_ID
+    global headers
+    prepare_for_api_call()
+    print(f'{action} on {universe_uuid}')
+    url = f"{YW_API}/customers/{YW_CUST_ID}/universes/{universe_uuid}/{action}"
+    print(url)
+    response = requests.post(
+        url,
+        headers=headers,
+        verify=False
+    )
+    if response.status_code == 200:
+        action_response = response.json()
+        print(f'Running {action} on universe {universe_uuid}. task:({action_response["taskUUID"]}),rid:({action_response["resourceUUID"]})')
+    else:
+        print(response)
+
+
+def select_universe(universe_list):
+  for idx,u in enumerate(universe_list):
+    serial = str(idx + 1)
+    name =  u["name"]
+    status = "PAUSED" if u["universeDetails"]["universePaused"] == True else  "RUNNING"
+    uuid = u["universeUUID"]
+    print(f'{serial:4}: [{status:7}] {name:32} ({uuid})')
+  choice_str = input("Enter Universe Number to resume: ")
+  selected = int(choice_str)
+  index = selected - 1
+  selected_universe = universe_list[index]
+  return selected_universe
+
+def process_arguments():
+    parser = argparse.ArgumentParser(
+        prog="ybamg",
+        description= "Manage YB Universes",
+        epilog="YMMW, Use at your own risk"
+    )
+
+    parser.add_argument(
+        "--uuid",
+        help = "Universe UUID",
+        required = "--action" in sys.argv,
+        nargs='*'
+    )
+    parser.add_argument(
+        "--action",
+        help = "What action to perform",
+        required = "--uuid" in sys.argv,
+        choices=['pause','resume']
+    )
+    return parser.parse_args()
+
+if __name__ == "__main__":
+    main()
+
