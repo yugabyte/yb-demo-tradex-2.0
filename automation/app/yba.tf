@@ -1,5 +1,5 @@
 data "http" "yba-customer" {
-  url = "${var.yba.api-endpoint}/customers"
+  url = "${var.yba.api-endpoint}/session_info"
   request_headers = {
     Accept              = "application/json"
     X-AUTH-YW-API-TOKEN = var.yba.api-token
@@ -13,7 +13,7 @@ data "http" "yba-customer" {
   insecure = var.yba.insecure
 }
 locals {
-  yba-customer-uuid = jsondecode(chomp(data.http.yba-customer.response_body))[0].uuid
+  yba-customer-uuid = jsondecode(chomp(data.http.yba-customer.response_body)).customerUUID
   yba-client = merge({
     customer-uuid = local.yba-customer-uuid
   }, var.yba)
