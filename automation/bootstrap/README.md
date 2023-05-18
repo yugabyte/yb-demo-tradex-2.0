@@ -37,3 +37,21 @@ It also does:
 ```bash
 
 ```
+
+
+## Use bootstrap module
+
+1. Create a workspace directory for terraform
+2. Create main.tf with:
+
+    ```hcl
+    module "tradex-jumpbox" {
+      source = "git@github.com:yugabyte/yb-demo-tradex-2.0.git//automation/bootstrap"
+      vpc-id ="<VPC-ID>"
+      subnet-id="<SUBNET-ID>"
+      prefix="<PREFIX>"
+      aws-profile="<LOCAL-AWS-PROFILE-NAME>"
+      tags = {} // Tags to put on all resources
+    }
+    ```
+
