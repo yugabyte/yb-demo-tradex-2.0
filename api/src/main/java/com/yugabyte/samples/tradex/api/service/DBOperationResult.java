@@ -13,8 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 public class DBOperationResult {
     Object data;
-    List<String> queries = new ArrayList<>();
-    List<String> explainResults = new ArrayList<>();
+    List<String> queries = new ArrayList<>(0);
+    List<String> explainResults = new ArrayList<>(0);
     long latencyMillis;
     ConnectionInfo connectionInfo;
 }
