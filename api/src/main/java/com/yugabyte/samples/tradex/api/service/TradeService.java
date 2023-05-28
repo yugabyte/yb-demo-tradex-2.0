@@ -12,13 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class TradeService {
     @Autowired
     SqlProvider queryProvider;
 
-    @Transactional
+
     public void deleteAllUserTrades(TradeXDataSourceType dbType, int userId) {
         int update = jdbcTemplateResolver.resolve(dbType)
                 .update(queryProvider.getTradeSQL(TradeSql.DEL_USER_TRADES), Map.of("userId", userId));
@@ -46,13 +46,29 @@ public class TradeService {
     }
 
 
-    @Transactional
-    public void insertTrades(TradeXDataSourceType dbType, List<SqlParameterSource> parameterSources) {
-        int[] update = jdbcTemplateResolver.resolve(dbType).batchUpdate(queryProvider.getTradeSQL(TradeSql.INSERT_TRADE),
-                parameterSources.toArray(new SqlParameterSource[0]));
-        log.info("inserted {} trade records into db:{}", update.length, dbType.name());
+
+    public void insertTrades(TradeXDataSourceType dbType, List<TradeOrder> parameterSources, int userId, String prefRegion) {
+        int[][] update = jdbcTemplateResolver.resolve(dbType).getJdbcOperations()
+                .batchUpdate(queryProvider.getTradeSQL(TradeSql.BULK_INSERT_TRADE),
+                parameterSources, 500, (ps, order) -> {
+                    ps.setInt(1, userId);
+                    ps.setInt(2, order.getStock().getId());
+                    ps.setString(3, order.getTradeType());
+                    ps.setTimestamp(4, Timestamp.from(order.getOrderTime()));
+                    ps.setDouble(5, order.getBidPrice());
+                    ps.setString(6, prefRegion);
+                    ps.setDouble(7, order.getStockUnits());
+                    ps.setString(8, order.getPayMethod().name());
+
+                });
+
+        for (int i = 0; i < update.length; i++) {
+            log.info("inserted {} trade records into db:{} in batch: {}", update[i].length, dbType.name(), 1 + i);
+        }
+
     }
 
+    @Transactional(readOnly = true)
     public List<TradeOrder> fetchByUserAndLimit(TradeXDataSourceType dbType, Integer userId, Integer prevId,
                                                 Integer plimit, String prefRegion) {
         NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
@@ -68,7 +84,7 @@ public class TradeService {
                         t.setOrderTime(rs.getTimestamp("order_time").toInstant());
                         t.setBidPrice(rs.getDouble("bid_price"));
                         t.setPayMethod(AppConstants.PayMethod.valueOf(rs.getString("pay_method")));
-                        t.setStockUnits(rs.getBigDecimal("stock_units"));
+                        t.setStockUnits(rs.getDouble("stock_units"));
                         return t;
                     } catch (NullPointerException e) {
                         e.printStackTrace();
@@ -82,36 +98,6 @@ public class TradeService {
         return stockInfoService.getStockSymbol(dbType, symbol_id);
     }
 
-
-// --Commented out by Inspection START (24-01-2023 12:59):
-//  public TradeOrder getTradeByOrderId(TradeXDataSourceType dbType, Integer tradeOrderId) {
-//    NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-//    return template.queryForObject(queryProvider.getTradeSQL(TradeSql.FETCH_TRADE_BY_ID),
-//            Map.of("orderId", tradeOrderId), new RowMapper<TradeOrder>() {
-//              @Override
-//              public TradeOrder mapRow(ResultSet rs, int rowNum) throws SQLException {
-//                try {
-//                  TradeOrder t = new TradeOrder();
-//                  t.setUserId(rs.getInt("user_id"));
-//                  t.setId(rs.getInt("order_id"));
-//                  t.setStock(getSymbol(dbType, rs.getInt("symbol_id")));
-//                  t.setTradeType(rs.getString("trade_type"));
-//                  t.setOrderTime(rs.getTimestamp("order_time").toInstant());
-//                  t.setBidPrice(rs.getDouble("bid_price"));
-//                  t.setPayMethod(AppConstants.PayMethod.valueOf(rs.getString("pay_method")));
-//                  t.setStockUnits(rs.getBigDecimal("stock_units"));
-//                  return t;
-//                } catch (NullPointerException e) {
-//                  e.printStackTrace();
-//                  throw e;
-//                }
-//              }
-//            });
-//
-//  }
-// --Commented out by Inspection STOP (24-01-2023 12:59)
-
-    @Transactional
     public Integer save(TradeXDataSourceType dbType, TradeOrderRequest newTradeOrder, Integer stockId,
                         BigDecimal closePrice, Integer userId, String preferredRegion) {
 
