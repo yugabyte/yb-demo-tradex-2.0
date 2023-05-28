@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -12,8 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 public class DBOperationResult {
     Object data;
-    List<String> queries;
-    List<String> explainResults;
+    List<String> queries = new ArrayList<>();
+    List<String> explainResults = new ArrayList<>();
     long latencyMillis;
     ConnectionInfo connectionInfo;
 }

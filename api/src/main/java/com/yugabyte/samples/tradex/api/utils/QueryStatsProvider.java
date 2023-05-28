@@ -72,14 +72,14 @@ public class QueryStatsProvider {
                                               Boolean inspectQueries, SqlQueries.UserSql sqlKey,
                                               MapSqlParameterSource params, long timeElapsed,
                                               ConnectionInfo connectionInfo) {
-        List<String> analyzeQuery = Collections.emptyList();
-        String query = sqlProvider.getUserSQL(sqlKey);
+
         if (inspectQueries) {
-            analyzeQuery = queryAnalysisService.analyzeQuery(dbType, query, params);
+            String query = sqlProvider.getUserSQL(sqlKey);
+            List<String> analyzeQuery = queryAnalysisService.analyzeQuery(dbType, query, params);
+            result.setExplainResults(analyzeQuery);
         }
 
         result.setConnectionInfo(connectionInfo);
-        result.setQueries(analyzeQuery);
         result.setLatencyMillis(timeElapsed);
 
         return result;

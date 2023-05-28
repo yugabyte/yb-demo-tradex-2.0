@@ -147,9 +147,11 @@ export default function Xray() {
                 {"       "}
                 {log.logs}
               </div>
-              {log.explainAnalyzeResults.map((result) => {
+              {
+              log.explainAnalyzeResults? ( log.explainAnalyzeResults.map((result) => {
                 return <ExplainAnalyzeResult message={result} key={uuidv4()} />;
-              })}
+              })) : ("")
+              }
               {log.latency ? (
                 <ExplainAnalyzeResult
                   message={`Total Latency: ${log.latency} ms`}

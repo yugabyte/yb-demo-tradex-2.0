@@ -63,7 +63,8 @@ public class TradeService {
                 });
 
         for (int i = 0; i < update.length; i++) {
-            log.info("inserted {} trade records into db:{} in batch: {}", update[i].length, dbType.name(), 1 + i);
+            log.info("inserted {} trade records into db:{} in batch: {} for user:{}",
+                    update[i].length, dbType.name(), 1 + i, userId);
         }
 
     }
