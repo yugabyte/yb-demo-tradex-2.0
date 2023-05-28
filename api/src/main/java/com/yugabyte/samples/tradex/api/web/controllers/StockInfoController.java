@@ -1,15 +1,15 @@
 package com.yugabyte.samples.tradex.api.web.controllers;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import com.yugabyte.samples.tradex.api.config.TradeXDataSourceType;
 import com.yugabyte.samples.tradex.api.domain.business.StockPerformanceEntry;
 import com.yugabyte.samples.tradex.api.domain.db.AppUser;
 import com.yugabyte.samples.tradex.api.domain.db.TradeXStock;
 import com.yugabyte.samples.tradex.api.domain.repo.ConnectionInfoRepo;
-import com.yugabyte.samples.tradex.api.domain.repo.ExplainQueryRepo;
 import com.yugabyte.samples.tradex.api.service.DBOperationResult;
 import com.yugabyte.samples.tradex.api.service.StockInfoService;
 import com.yugabyte.samples.tradex.api.service.UserService;
-import com.yugabyte.samples.tradex.api.utils.SqlProvider;
+import com.yugabyte.samples.tradex.api.utils.QueryStatsProvider;
 import com.yugabyte.samples.tradex.api.web.dto.ConnectionInfo;
 import com.yugabyte.samples.tradex.api.web.utils.TradeXDBTypeContext;
 import com.yugabyte.samples.tradex.api.web.utils.WebConstants;
@@ -18,39 +18,30 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.yugabyte.samples.tradex.api.utils.SqlQueries.StockSql.*;
 
 @RestController
 @CrossOrigin
 @Slf4j
-public class StockInfoController {
+public class StockInfoController extends BaseController {
 
     @Autowired
     StockInfoService stockInfoService;
-
     @Autowired
     UserService userService;
-
-    @Autowired
-    ExplainQueryRepo explainQueryRepo;
-
     @Autowired
     ConnectionInfoRepo connectionInfoRepo;
-
     @Autowired
-    SqlProvider sqlProvider;
-
+    QueryStatsProvider enhancer;
 
     @GetMapping("/api/stocks/{symbol}")
     @Operation(summary = "Fetch Stock Info from yahoo")
@@ -67,25 +58,20 @@ public class StockInfoController {
         Instant start = Instant.now();
 
         TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        AppUser user = userService.findByEmail(dbType, userDetails.getUsername()).get();
+        AppUser user = fetchUser(authentication);
         ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType, user.getId().getPreferredRegion());
         if (StringUtils.isEmpty(fromDate) || StringUtils.isEmpty(toDate)) {
             data = stockInfoService.getStock(dbType, symbol, includeHist);
         } else {
             data = stockInfoService.getHistoricalTradeXStock(dbType, symbol, fromDate, toDate);
         }
+        long timeElapsed = Duration.between(start, Instant.now()).toMillis();
 
-        String query = sqlProvider.getStockSQL(STOCK_BY_SYMBOL_SQL); //"select * from trade_symbol ts where ts.symbol = :psymbol";
-        Map<String, Object> parameters = Map.of("psymbol", symbol);
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("psymbol", symbol);
 
-        List<String> analyzeQuery = Collections.emptyList();
-        if (inspectQueries) {
-            analyzeQuery = explainQueryRepo.analyzeQuery(dbType, query, parameters);
-        }
-
-        return new DBOperationResult(data, List.of("Executing ( " + dbType + " ) > " + query, parameters.toString()),
-                analyzeQuery, Duration.between(start, Instant.now()).toMillis(), connectionInfo);
+        return enhancer.loadStockQueryStats(dbType, data, inspectQueries, parameters,
+                STOCK_BY_SYMBOL_SQL, timeElapsed, connectionInfo);
 
     }
 
@@ -103,23 +89,14 @@ public class StockInfoController {
         try {
 
             TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            AppUser user = userService.findByEmail(dbType, userDetails.getUsername()).get();
+            AppUser user = fetchUser(authentication);
             ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType, user.getId().getPreferredRegion());
 
             data = stockInfoService.fetchAllActiveStocksPerformance();
+            long timeElapsed = Duration.between(start, Instant.now()).toMillis();
 
-            String query = sqlProvider.getStockSQL(ALL_ACTIVE_STOCKS); //"select * from trade_symbol ts where ts.enabled=true";
-            Map<String, Object> parameters = new HashMap<>(0);
-
-            List<String> analyzeQuery = Collections.emptyList();
-            if (inspectQueries) {
-                analyzeQuery = explainQueryRepo.analyzeQuery(dbType, query, parameters);
-            }
-
-
-            return new DBOperationResult(data, List.of("Executing ( " + dbType + " ) > " + query, parameters.toString()),
-                    analyzeQuery, Duration.between(start, Instant.now()).toMillis(), connectionInfo);
+            return enhancer.loadStockQueryStats(dbType, data, inspectQueries, new MapSqlParameterSource(),
+                    ALL_ACTIVE_STOCKS, timeElapsed, connectionInfo);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -136,38 +113,24 @@ public class StockInfoController {
     public DBOperationResult fetchFavStocks(Authentication authentication,
                                             @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                     required = false, defaultValue = "false") Boolean inspectQueries) {
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        AppUser appUser = userService.findByEmail(dbType, userDetails.getUsername()).get();
-        ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType, appUser.getId().getPreferredRegion());
-
-        List<StockPerformanceEntry> data;
-        Instant start = Instant.now();
-
-
-        Integer[] favs = appUser.getFavourites();
-        data = stockInfoService.fetchFavStocksPerformance(favs);
-
-
         try {
+            TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
 
-            String query = sqlProvider.getStockSQL(APP_USER_FAV_STOCKS);
-//      "select ts.* from trade_symbol ts, app_user au  where au.id = :userId " +
-//        "and au.preferred_region = :prefRegion and ts.enabled = true " +
-//        "and ts.trade_symbol_id = any(au.favourites)";
+            AppUser appUser = fetchUser(authentication);
+            ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType, appUser.getId().getPreferredRegion());
 
-            Map<String, Object> params = new HashMap<>(2);
-            params.put("userId", appUser.getId().getId());
-            params.put("prefRegion", appUser.getId().getPreferredRegion());
+            List<StockPerformanceEntry> data;
+            Instant start = Instant.now();
+            Integer[] favs = appUser.getFavourites();
+            data = stockInfoService.fetchFavStocksPerformance(favs);
+            long timeElapsed = Duration.between(start, Instant.now()).toMillis();
 
-            List<String> analyzeQuery = Collections.emptyList();
-            if (inspectQueries) {
-                analyzeQuery = explainQueryRepo.analyzeQuery(dbType, query, params);
-            }
+            MapSqlParameterSource params = new MapSqlParameterSource();
+            params.addValue("userId", appUser.getId().getId());
+            params.addValue("prefRegion", appUser.getId().getPreferredRegion());
 
-            return new DBOperationResult(data, List.of("Executing ( " + dbType + " ) > " + query, params.toString()),
-                    analyzeQuery, Duration.between(start, Instant.now()).toMillis(), connectionInfo);
+            return enhancer.loadStockQueryStats(dbType, data, inspectQueries, params,
+                    APP_USER_FAV_STOCKS, timeElapsed, connectionInfo);
 
         } catch (Exception e) {
             e.printStackTrace();

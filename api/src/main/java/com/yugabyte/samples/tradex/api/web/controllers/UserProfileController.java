@@ -6,16 +6,12 @@ import com.yugabyte.samples.tradex.api.config.TradeXDataSourceType;
 import com.yugabyte.samples.tradex.api.domain.business.Portfolio;
 import com.yugabyte.samples.tradex.api.domain.business.UserNotifications;
 import com.yugabyte.samples.tradex.api.domain.db.AppUser;
-import com.yugabyte.samples.tradex.api.domain.repo.ConnectionInfoRepo;
-import com.yugabyte.samples.tradex.api.domain.repo.ExplainQueryRepo;
 import com.yugabyte.samples.tradex.api.service.ApplicationServiceException;
 import com.yugabyte.samples.tradex.api.service.DBOperationResult;
 import com.yugabyte.samples.tradex.api.service.PortfolioService;
 import com.yugabyte.samples.tradex.api.service.UserService;
 import com.yugabyte.samples.tradex.api.utils.AppUserParamUtils;
-import com.yugabyte.samples.tradex.api.utils.QueryParamDisplayUtils;
-import com.yugabyte.samples.tradex.api.utils.SqlProvider;
-import com.yugabyte.samples.tradex.api.utils.SqlQueries.UserSql;
+import com.yugabyte.samples.tradex.api.utils.QueryStatsProvider;
 import com.yugabyte.samples.tradex.api.web.dto.ConnectionInfo;
 import com.yugabyte.samples.tradex.api.web.dto.VerifyPinRequest;
 import com.yugabyte.samples.tradex.api.web.utils.TradeXDBTypeContext;
@@ -25,40 +21,29 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.yugabyte.samples.tradex.api.utils.SqlQueries.UserSql.*;
 
 @RestController
 @Slf4j
 @CrossOrigin
-public class UserProfileController {
+public class UserProfileController extends BaseController {
 
     @Autowired
     UserService userService;
-
     @Autowired
     PortfolioService portfolioService;
-
-    @Autowired
-    ExplainQueryRepo explainQueryRepo;
-
-    @Autowired
-    ConnectionInfoRepo connectionInfoRepo;
-
-    @Autowired
-    AppUserParamUtils appUserParamhelper;
-
-    @Autowired
-    SqlProvider sqlProvider;
-
     @Autowired
     AppUserParamUtils paramUtils;
+    @Autowired
+    QueryStatsProvider enhancer;
 
     ObjectMapper mapper = new ObjectMapper();
 
@@ -70,21 +55,16 @@ public class UserProfileController {
                                              required = false, defaultValue = "false") Boolean inspectQueries) throws ApplicationServiceException {
         Instant start = Instant.now();
         TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        AppUser user = userService.findByEmail(dbType, userDetails.getUsername())
-                .orElseThrow(() -> new ApplicationServiceException("User details are missing"));
-        ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType, user.getId().getPreferredRegion());
 
-        Map parameters = Map.of("pEmail", userDetails.getUsername());
-        List<String> analyzeQuery = Collections.emptyList();
-        if (inspectQueries) {
-            analyzeQuery = explainQueryRepo.analyzeQuery(dbType, sqlProvider.getUserSQL(FIND_BY_EMAIL_SQL), (Map<String, Object>) parameters);
-        }
-        return new DBOperationResult(user, List.of("Executing ( " + dbType + " ) > "
-                + sqlProvider.getUserSQL(FIND_BY_EMAIL_SQL), parameters.toString()), analyzeQuery,
-                Duration.between(start, Instant.now()).toMillis(),
-                connectionInfo
-        );
+        AppUser user = fetchUser(authentication);
+        ConnectionInfo connectionInfo = fetchConnectionInfo(user.getId().getPreferredRegion());
+
+        long timeElapsed = Duration.between(start, Instant.now()).toMillis();
+
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("pEmail", user.getEmail());
+
+        return enhancer.loadUserQueryStats(dbType, user, inspectQueries, parameters, FIND_BY_EMAIL_SQL, timeElapsed, connectionInfo);
 
     }
 
@@ -94,10 +74,9 @@ public class UserProfileController {
                                     @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
                                     Authentication authentication) {
 
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        AppUser user = fetchUser(authentication);
         try {
-            return portfolioService.getPortfolio(TradeXDBTypeContext.getDbType(), userDetails.getUsername());
+            return portfolioService.getPortfolio(TradeXDBTypeContext.getDbType(), user.getEmail());
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -111,27 +90,22 @@ public class UserProfileController {
                                        @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                required = false, defaultValue = "false") Boolean inspectQueries) {
         TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        AppUser appUserFromDB = userService.findByEmail(dbType, userDetails.getUsername()).get();
-        ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType, appUserFromDB.getId().getPreferredRegion());
+        AppUser appUserFromDB = fetchUser(authentication);
+        ConnectionInfo connectionInfo = fetchConnectionInfo(appUserFromDB.getId().getPreferredRegion());
+
         Instant start = Instant.now();
-
         Boolean data = userService.verifyPin(dbType, appUserFromDB.getId().getId(),
                 appUserFromDB.getId().getPreferredRegion(), verifyPinRequest.getPin());
-        String insertQuery = sqlProvider.getUserSQL(UserSql.VERIFY_USE_PIN_SQL);
-        Map parameters = Map.of("pUserId", appUserFromDB.getId().getId(),
-                "pUserPin", verifyPinRequest.getPin(),
-                "prefRegion", appUserFromDB.getId().getPreferredRegion());
+        long timeElapsed = Duration.between(start, Instant.now()).toMillis();
 
-        List<String> analyzeQuery = Collections.emptyList();
-        if (inspectQueries) {
-            analyzeQuery = explainQueryRepo.analyzeQuery(dbType, insertQuery, (Map<String, Object>) parameters);
-        }
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("pUserId", appUserFromDB.getId().getId());
+        parameters.addValue("pUserPin", verifyPinRequest.getPin());
+        parameters.addValue("prefRegion", appUserFromDB.getId().getPreferredRegion());
 
-        return new DBOperationResult(data, List.of("Executing ( " + dbType + " ) > "
-                + insertQuery, parameters.toString()), analyzeQuery,
-                Duration.between(start, Instant.now()).toMillis(), connectionInfo);
+        return enhancer.loadUserQueryStats(dbType, data, inspectQueries, parameters,
+                VERIFY_USE_PIN_SQL, timeElapsed, connectionInfo);
     }
 
 
@@ -141,19 +115,19 @@ public class UserProfileController {
                                            @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                    required = false, defaultValue = "false") Boolean inspectQueries) {
         TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        AppUser appUserFromDB = userService.findByEmail(dbType, userDetails.getUsername()).get();
-        DBOperationResult result = userService.createNewUser(dbType, appUser, appUserFromDB.getId().getPreferredRegion());
-        MapSqlParameterSource params = appUserParamhelper.getSQLParams(appUser, appUserFromDB.getId().getPreferredRegion());
 
-        List<String> analyzeQuery = Collections.emptyList();
-        if (inspectQueries) {
-            analyzeQuery = explainQueryRepo.analyzeQuery(dbType, sqlProvider.getUserSQL(INSERT_APP_USER), params);
-        }
+        AppUser appUserFromDB = fetchUser(authentication);
+        ConnectionInfo connectionInfo = fetchConnectionInfo(appUserFromDB.getId().getPreferredRegion());
 
+        Instant start = Instant.now();
+        DBOperationResult result = userService.createNewUser(dbType, appUser,
+                appUserFromDB.getId().getPreferredRegion());
+        long timeElapsed = Duration.between(start, Instant.now()).toMillis();
+        MapSqlParameterSource params = paramUtils.getSQLParams(appUser,
+                appUserFromDB.getId().getPreferredRegion());
 
-        result.setExplainResults(analyzeQuery);
-        return result;
+        return enhancer.updateQueryStats(result, dbType, inspectQueries, INSERT_APP_USER,
+                params, timeElapsed, connectionInfo);
     }
 
     @PutMapping("/api/user")
@@ -162,24 +136,20 @@ public class UserProfileController {
                                         @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                 required = false, defaultValue = "false") Boolean inspectQueries) {
         TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        AppUser appUserFromDB = userService.findByEmail(dbType, userDetails.getUsername()).get();
+
+        AppUser appUserFromDB = fetchUser(authentication);
+        ConnectionInfo connectionInfo = fetchConnectionInfo(appUserFromDB.getId().getPreferredRegion());
 
         Instant start = Instant.now();
-
         DBOperationResult result = userService.updateUser(dbType, appUser);
+        long timeElapsed = Duration.between(start, Instant.now()).toMillis();
 
-        List<String> analyzeQuery = Collections.emptyList();
+        MapSqlParameterSource params = paramUtils.getSQLParams(appUser,
+                appUserFromDB.getId().getPreferredRegion());
+        params.addValue("uid", appUser.getId().getId());
 
-        if (inspectQueries) {
-            MapSqlParameterSource params = appUserParamhelper.getSQLParams(appUser, appUserFromDB.getId().getPreferredRegion());
-            params.addValue("uid", appUser.getId().getId());
-            analyzeQuery = explainQueryRepo.analyzeQuery(dbType, sqlProvider.getUserSQL(UPDATE_APP_USER), params);
-        }
-
-        result.setExplainResults(analyzeQuery);
-        result.setLatencyMillis(Duration.between(start, Instant.now()).toMillis());
-        return result;
+        return enhancer.updateQueryStats(result, dbType, inspectQueries, UPDATE_APP_USER,
+                params, timeElapsed, connectionInfo);
     }
 
     @PutMapping("/api/me/fav/{stockId}")
@@ -191,17 +161,13 @@ public class UserProfileController {
                                                    required = false, defaultValue = "false") Boolean inspectQueries) {
 
         TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        AppUser appUser = userService.findByEmail(dbType, userDetails.getUsername()).get();
-        ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType, appUser.getId().getPreferredRegion());
-        Instant start = Instant.now();
+        AppUser appUser = fetchUser(authentication);
+        ConnectionInfo connectionInfo = fetchConnectionInfo(appUser.getId().getPreferredRegion());
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("uid", appUser.getId().getId());
         params.addValue("prefRegion", appUser.getId().getPreferredRegion());
-
-        List<String> analyzeQuery = Collections.emptyList();
 
         List<Integer> favourites = new ArrayList<>();
 
@@ -217,21 +183,17 @@ public class UserProfileController {
         if ("DEL".equalsIgnoreCase(action) &&
                 (appUser.getFavourites() != null && favourites.contains(stockId))) {
             favourites.remove(stockId);
-
         }
+
         params.addValue("favourites", favourites.toArray(new Integer[0]));
+
+        Instant start = Instant.now();
         DBOperationResult result = userService.updateUserFavourites(dbType, appUser.getId(), favourites.toArray(new Integer[0]));
-        if (inspectQueries) {
-            analyzeQuery = explainQueryRepo.analyzeQuery(dbType, sqlProvider.getUserSQL(UPDATE_USER_FAV), params);
-        }
 
-        result.setExplainResults(analyzeQuery);
-        result.setLatencyMillis(Duration.between(start, Instant.now()).toMillis());
-        result.setConnectionInfo(connectionInfo);
+        long timeElapsed = Duration.between(start, Instant.now()).toMillis();
 
-
-        return result;
-
+        return enhancer.updateQueryStats(result, dbType, inspectQueries, UPDATE_USER_FAV,
+                params, timeElapsed, connectionInfo);
     }
 
     @PutMapping("/api/me/notifs")
@@ -241,11 +203,13 @@ public class UserProfileController {
                                                      @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                              required = false, defaultValue = "false") Boolean inspectQueries) {
         TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        AppUser appUser = userService.findByEmail(dbType, userDetails.getUsername()).get();
+
+        AppUser appUser = fetchUser(authentication);
+        ConnectionInfo connectionInfo = fetchConnectionInfo(appUser.getId().getPreferredRegion());
 
         Instant start = Instant.now();
         DBOperationResult result = userService.updateUserNotifications(dbType, appUser.getId(), userNotifications);
+        long timeElapsed = Duration.between(start, Instant.now()).toMillis();
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("uid", appUser.getId().getId());
         params.addValue("prefRegion", appUser.getId().getPreferredRegion());
@@ -257,17 +221,8 @@ public class UserProfileController {
             throw new IllegalArgumentException("failed to parse either personal details or notifications");
         }
 
-        String query = sqlProvider.getUserSQL(UPDATE_USER_NOTIF);
-        List<String> analyzeQuery = Collections.emptyList();
-        if (inspectQueries) {
-            analyzeQuery = explainQueryRepo.analyzeQuery(dbType, query, params);
-        }
-
-        result.setQueries(List.of("Executing ( " + dbType + " ) > "
-                + query, QueryParamDisplayUtils.getParameters(params)));
-        result.setLatencyMillis(Duration.between(start, Instant.now()).toMillis());
-        result.setExplainResults(analyzeQuery);
-        return result;
+        return enhancer.updateQueryStats(result, dbType, inspectQueries, UPDATE_USER_NOTIF,
+                params, timeElapsed, connectionInfo);
     }
 
     @PutMapping("/api/me/lang/{langCode}")
@@ -277,31 +232,22 @@ public class UserProfileController {
                                                 @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                         required = false, defaultValue = "false") Boolean inspectQueries) {
         TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        AppUser appUser = userService.findByEmail(dbType, userDetails.getUsername()).get();
 
+        AppUser appUser = fetchUser(authentication);
+        ConnectionInfo connectionInfo = fetchConnectionInfo(appUser.getId().getPreferredRegion());
         Instant start = Instant.now();
 
         DBOperationResult result = userService.updateUserLanguage(dbType, appUser.getId(), langCode);
-        long queryTime = Duration.between(start, Instant.now()).toMillis();
+        long timeElapsed = Duration.between(start, Instant.now()).toMillis();
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("uid", appUser.getId().getId());
         params.addValue("prefRegion", appUser.getId().getPreferredRegion());
         params.addValue("langCode", langCode);
 
-        String query = sqlProvider.getUserSQL(UPDATE_USER_LANG);
+        return enhancer.updateQueryStats(result, dbType, inspectQueries, UPDATE_USER_NOTIF,
+                params, timeElapsed, connectionInfo);
 
-        List<String> analyzeQuery = Collections.emptyList();
-        if (inspectQueries) {
-            analyzeQuery = explainQueryRepo.analyzeQuery(dbType, query, params);
-        }
-
-        result.setQueries(List.of("Executing ( " + dbType + " ) > "
-                + query, QueryParamDisplayUtils.getParameters(params)));
-        result.setLatencyMillis(queryTime);
-        result.setExplainResults(analyzeQuery);
-        return result;
     }
 
 }
