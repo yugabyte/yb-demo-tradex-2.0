@@ -10,8 +10,13 @@ yb_container=tradex-yb
 yb_client_image=${yb_client_image:-yugabytedb/yugabyte-client:latest}
 yb_client_container=tradex-yb-client
 
+db_initializer_image=db-initializer
+db_initializer_container=tradexdb-initializer
+
 db_migration_image=${db_migration_image:-tradex-db:latest}
 db_migration_container=tradex-migration
+
+
 
 function db_create(){
   echo Run YugabtyeDB
@@ -40,6 +45,19 @@ function roles_init(){
 function migration_build(){
   echo "Build migration docker image"
   docker build $PROJECT_DIR/db -t $db_migration_image
+}
+
+function initializer_build(){
+  echo "Build initializer docker image"
+  docker build -f ./Dockerfile-Initializer -t $db_initializer_image $PROJECT_DIR/db
+}
+
+function initializer_run(){
+docker run --rm -it -e DB_HOST=$yb_container \
+    --name $db_initializer_container \
+    --hostname $db_initializer_container \
+    --link $yb_container:$yb_container \
+    $db_initializer_image 
 }
 
 function migration_run(){
@@ -87,7 +105,10 @@ function flyway(){
 function bootstrap(){
   echo "Bootstraping local db"
   db_create
-  roles_init
+ # roles_init
+ initializer_build
+ initializer_run
+
   migration_build
   migration_run
 }
