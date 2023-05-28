@@ -10,7 +10,7 @@ import com.yugabyte.samples.tradex.api.utils.TradeXJdbcTemplateResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -36,9 +36,8 @@ public class StockRepo {
 
     public TradeXStock getTradeXStock(TradeXDataSourceType dbType, String symbol) {
         NamedParameterJdbcTemplate template = resolver.resolve(dbType);
-        TradeXStock tradeXStock = template.queryForObject(provider.getStockSQL(SqlQueries.StockSql.STOCK_BY_SYMBOL_SQL),
+        return template.queryForObject(provider.getStockSQL(SqlQueries.StockSql.STOCK_BY_SYMBOL_SQL),
                 Map.of("psymbol", symbol), new TradeXStockRowMapper());
-        return tradeXStock;
     }
 
     public TradeXStock getStockSymbol(TradeXDataSourceType dbType, int symbolId) {
