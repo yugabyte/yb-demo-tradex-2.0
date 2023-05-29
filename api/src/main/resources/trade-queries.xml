@@ -9,6 +9,14 @@
     ]]>
   </entry>
 
+
+  <entry key="BULK_INSERT_TRADE">
+    <![CDATA[
+        INSERT INTO trade_orders (user_id, symbol_id, trade_type, order_time, bid_price, preferred_region, stock_units, pay_method)
+          VALUES ( ?, ?, ?, ?, ?, ?, ?, ?)
+    ]]>
+  </entry>
+
   <entry key="DEL_USER_TRADES">
     <![CDATA[
         DELETE FROM trade_orders WHERE user_id = :userId

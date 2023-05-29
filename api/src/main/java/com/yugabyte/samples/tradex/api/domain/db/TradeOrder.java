@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 
 @Data
@@ -19,5 +18,5 @@ public class TradeOrder {
     private Instant orderTime;
     private Double bidPrice;
     private AppConstants.PayMethod payMethod;
-    private BigDecimal stockUnits;
+    private Double stockUnits;
 }

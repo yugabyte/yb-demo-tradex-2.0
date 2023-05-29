@@ -62,9 +62,7 @@ public class StockInfoService {
 
     public void loadStockTrendCache() {
 
-        stockRepo.fetchStockTrends().forEach(e -> {
-            stockInfoCache.addStockTrend(e.getFirst(), e.getSecond());
-        });
+        stockRepo.fetchStockTrends().forEach(e -> stockInfoCache.addStockTrend(e.getKey(), e.getValue()));
 
         stockTrendLoaded = true;
         log.info("Stock Trend Cache updated");

@@ -1,0 +1,5 @@
+FROM yugabytedb/yugabyte-client:latest
+ENV DB_HOST tradex-db
+COPY init-scripts /home/yugabyte/init-sql
+WORKDIR /home/yugabyte/init-sql
+CMD ysqlsh -h $DB_HOST  -f /home/yugabyte/init-sql/init-01.sql 
