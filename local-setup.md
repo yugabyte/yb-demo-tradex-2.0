@@ -21,9 +21,9 @@ this will start a yugabyte database, create roles and perform migration using fl
     cd api
     mvn clean package
 
-    source api/env-local
+    source env-local
 
-    java -jar api/target/tradex-api-*.jar
+    java -jar target/tradex-api-*.jar
 ```
 to run from IDE
 
