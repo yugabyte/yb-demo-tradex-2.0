@@ -3,6 +3,7 @@ package com.yugabyte.samples.tradex.api.utils;
 public class SqlQueries {
     public enum TradeSql {
         INSERT_TRADE,
+        BULK_INSERT_TRADE,
         DEL_USER_TRADES,
         FETCH_USER_TRADES,
         FETCH_TRADE_BY_ID

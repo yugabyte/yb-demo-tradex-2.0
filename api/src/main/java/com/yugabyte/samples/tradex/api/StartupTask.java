@@ -1,6 +1,7 @@
 package com.yugabyte.samples.tradex.api;
 
 import com.yugabyte.samples.tradex.api.config.TradeXDataSourceType;
+import com.yugabyte.samples.tradex.api.domain.db.TradeOrder;
 import com.yugabyte.samples.tradex.api.service.ApplicationServiceException;
 import com.yugabyte.samples.tradex.api.service.RefDataService;
 import com.yugabyte.samples.tradex.api.service.StockInfoService;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -52,8 +52,8 @@ public class StartupTask implements CommandLineRunner {
             if (loadRequired) {
                 log.info("Loading metadata - begin");
                 stockInfoService.loadStockPerformance(false);
-                List<SqlParameterSource> user1Trades = generator.generateTrades(354, 1, "boston", sampleStockList);
-                List<SqlParameterSource> user2Trades = generator.generateTrades(354, 2, "boston", sampleStockList);
+                List<TradeOrder> user1Trades = generator.generateTrades(354, 1, "boston", sampleStockList);
+                List<TradeOrder> user2Trades = generator.generateTrades(354, 2, "boston", sampleStockList);
                 for (TradeXDataSourceType t : TradeXDataSourceType.values()) {
                     dataService.getDBNodes(t);
                     dataService.getDbClusterTypes(t);
@@ -63,8 +63,8 @@ public class StartupTask implements CommandLineRunner {
                     if ("BOSTON".equalsIgnoreCase(location)) {
                         tradeService.deleteAllUserTrades(t, 1);
                         tradeService.deleteAllUserTrades(t, 2);
-                        tradeService.insertTrades(t, user1Trades);
-                        tradeService.insertTrades(t, user2Trades);
+                        tradeService.insertTrades(t, user1Trades, 1, "boston");
+                        tradeService.insertTrades(t, user2Trades, 2, "boston");
                     }
                 }
                 dataService.getNodeLocations();

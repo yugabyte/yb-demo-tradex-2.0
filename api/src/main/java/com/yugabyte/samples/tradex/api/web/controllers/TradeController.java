@@ -2,17 +2,12 @@ package com.yugabyte.samples.tradex.api.web.controllers;
 
 import com.yugabyte.samples.tradex.api.config.TradeXDataSourceType;
 import com.yugabyte.samples.tradex.api.domain.db.AppUser;
-import com.yugabyte.samples.tradex.api.domain.db.AppUserId;
 import com.yugabyte.samples.tradex.api.domain.db.TradeOrder;
 import com.yugabyte.samples.tradex.api.domain.db.TradeXStock;
-import com.yugabyte.samples.tradex.api.domain.repo.ConnectionInfoRepo;
-import com.yugabyte.samples.tradex.api.domain.repo.ExplainQueryRepo;
 import com.yugabyte.samples.tradex.api.service.DBOperationResult;
 import com.yugabyte.samples.tradex.api.service.StockInfoService;
 import com.yugabyte.samples.tradex.api.service.TradeService;
-import com.yugabyte.samples.tradex.api.service.UserService;
-import com.yugabyte.samples.tradex.api.utils.SqlProvider;
-import com.yugabyte.samples.tradex.api.utils.SqlQueries.TradeSql;
+import com.yugabyte.samples.tradex.api.utils.QueryStatsProvider;
 import com.yugabyte.samples.tradex.api.web.dto.ConnectionInfo;
 import com.yugabyte.samples.tradex.api.web.dto.TradeOrderRequest;
 import com.yugabyte.samples.tradex.api.web.utils.TradeXDBTypeContext;
@@ -20,36 +15,28 @@ import com.yugabyte.samples.tradex.api.web.utils.WebConstants;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static com.yugabyte.samples.tradex.api.utils.SqlQueries.TradeSql.FETCH_USER_TRADES;
 
 @RestController
 @Slf4j
 @CrossOrigin
-public class TradeController {
-
+public class TradeController extends BaseController {
     @Autowired
     TradeService tradeService;
     @Autowired
-    ExplainQueryRepo explainQueryRepo;
-    @Autowired
     StockInfoService stockInfoService;
     @Autowired
-    UserService userService;
-    @Autowired
-    ConnectionInfoRepo connectionInfoRepo;
-    @Autowired
-    SqlProvider sqlProvider;
+    QueryStatsProvider enhancer;
 
     @GetMapping("/api/trades")
     @SecurityRequirement(name = "auth-header-bearer")
@@ -60,28 +47,22 @@ public class TradeController {
                                                    required = false, defaultValue = "false") Boolean inspectQueries) {
 
         TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        AppUser appUserFromDB = userService.findByEmail(dbType, userDetails.getUsername()).get();
-        AppUserId userId = appUserFromDB.getId();
-        ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType, userId.getPreferredRegion());
+        AppUser appUser = fetchUser(authentication);
+        ConnectionInfo connectionInfo = fetchConnectionInfo(appUser.getId().getPreferredRegion());
+
         Instant start = Instant.now();
-        List<TradeOrder> tradeOrders = tradeService.fetchByUserAndLimit(dbType, userId.getId(), prevId, limit,
-                userId.getPreferredRegion());
+        List<TradeOrder> tradeOrders = tradeService.fetchByUserAndLimit(dbType, appUser.getId().getId(), prevId, limit,
+                appUser.getId().getPreferredRegion());
+        long timeElapsed = Duration.between(start, Instant.now()).toMillis();
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("pUserId", appUser.getId().getId());
+        parameters.addValue("prevId", prevId);
+        parameters.addValue("plimit", limit);
+        parameters.addValue("prefRegion", appUser.getId().getPreferredRegion());
 
-        Map<String, Object> parameters = Map.of("pUserId", userId.getId(),
-                "prevId", 0,
-                "plimit", limit,
-                "prefRegion", userId.getPreferredRegion());
-
-        List<String> analyzeQuery = Collections.emptyList();
-
-        if (inspectQueries) {
-            analyzeQuery = explainQueryRepo.analyzeQuery(dbType, sqlProvider.getTradeSQL(TradeSql.FETCH_USER_TRADES), parameters);
-        }
-
-        return new DBOperationResult(tradeOrders, List.of("Executing ( " + TradeXDBTypeContext.getDbType() + " ) > " + sqlProvider.getTradeSQL(TradeSql.FETCH_USER_TRADES),
-                parameters.toString()), analyzeQuery, Duration.between(start, Instant.now()).toMillis(), connectionInfo);
+        return enhancer.loadTradeQueryStats(dbType, tradeOrders, inspectQueries,
+                parameters, FETCH_USER_TRADES, timeElapsed, connectionInfo);
     }
 
     @PostMapping("/api/trades")
@@ -91,36 +72,31 @@ public class TradeController {
                                                  required = false, defaultValue = "false") Boolean inspectQueries) {
 
         TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        AppUser appUserFromDB = userService.findByEmail(dbType, userDetails.getUsername()).get();
-        AppUserId userId = appUserFromDB.getId();
-        ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType, userId.getPreferredRegion());
+        AppUser appUser = fetchUser(authentication);
+        ConnectionInfo connectionInfo = fetchConnectionInfo(appUser.getId().getPreferredRegion());
+
         Instant start = Instant.now();
 
         TradeXStock stock = stockInfoService.getStock(dbType, newTradeOrder.getSymbol(), false);
         Integer savedTradeId = tradeService.save(dbType, newTradeOrder, stock.getId(),
-                stock.getClosePrice(), userId.getId(), userId.getPreferredRegion());
+                stock.getClosePrice(), appUser.getId().getId(), appUser.getId().getPreferredRegion());
         log.info("Saved new trade entry: {}", savedTradeId);
+        long timeElapsed = Duration.between(start, Instant.now()).toMillis();
 
-        Map parameters = new HashMap();
-        parameters.put("userId", userId.getId());
-        parameters.put("symbolId", stock.getId());
-        parameters.put("tradeType", newTradeOrder.getTradeType().name());
-        parameters.put("bidPrice", stock.getClosePrice());
-        parameters.put("stockUnits", newTradeOrder.getInvestAmount().divide(stock.getClosePrice(), 3, RoundingMode.HALF_UP));
-        parameters.put("payMethod", newTradeOrder.getPayMethod().name());
-        parameters.put("order_time", LocalDateTime.now());
-        parameters.put("preferredRegion", userId.getPreferredRegion());
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("userId", appUser.getId().getId());
+        parameters.addValue("symbolId", stock.getId());
+        parameters.addValue("tradeType", newTradeOrder.getTradeType().name());
+        parameters.addValue("bidPrice", stock.getClosePrice());
+        parameters.addValue("stockUnits",
+                newTradeOrder.getInvestAmount().divide(stock.getClosePrice(), 3, RoundingMode.HALF_UP));
+        parameters.addValue("payMethod", newTradeOrder.getPayMethod().name());
+        parameters.addValue("order_time", LocalDateTime.now());
+        parameters.addValue("preferredRegion", appUser.getId().getPreferredRegion());
 
-        List<String> analyzeQuery = Collections.emptyList();
 
-        if (inspectQueries) {
-            analyzeQuery = explainQueryRepo.analyzeQuery(dbType, sqlProvider.getTradeSQL(TradeSql.INSERT_TRADE), parameters);
-        }
-
-        return new DBOperationResult(savedTradeId,
-                List.of("Executing ( " + dbType + " ) > " + sqlProvider.getTradeSQL(TradeSql.INSERT_TRADE), parameters.toString()),
-                analyzeQuery, Duration.between(start, Instant.now()).toMillis(), connectionInfo);
+        return enhancer.loadTradeQueryStats(dbType, savedTradeId, inspectQueries,
+                parameters, FETCH_USER_TRADES, timeElapsed, connectionInfo);
     }
 }

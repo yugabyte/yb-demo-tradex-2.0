@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @CrossOrigin
-public class ChartDataController {
+public class ChartDataController extends BaseController{
     @Autowired
     ChartDataService chartDataService;
     @Autowired
@@ -31,10 +31,8 @@ public class ChartDataController {
     public DBOperationResult getPortfolioChart(Authentication authentication,
                                                @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                        required = false, defaultValue = "false") Boolean inspectQueries) {
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        AppUser appUser = userService.findByEmail(dbType, userDetails.getUsername()).get();
 
+        AppUser appUser = fetchUser(authentication);
         return chartDataService.fetchPortfolioChart(TradeXDBTypeContext.getDbType(), appUser.getId(), inspectQueries);
     }
 

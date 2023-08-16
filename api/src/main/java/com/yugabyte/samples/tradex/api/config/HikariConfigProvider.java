@@ -4,6 +4,8 @@ import com.zaxxer.hikari.HikariConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Properties;
+
 @Component
 public class HikariConfigProvider {
 
@@ -23,7 +25,10 @@ public class HikariConfigProvider {
         config.setConnectionTimeout(12000);
         config.setKeepaliveTime(12000);
         config.setIdleTimeout(12000);
-        config.setDriverClassName("com.yugabyte.Driver");
+        Properties poolProps = new Properties();
+        poolProps.setProperty("reWriteBatchedInserts", "true");
+        poolProps.setProperty("dataSourceClassName", "com.yugabyte.ysql.YBClusterAwareDataSource");
+        config.setDataSourceProperties(poolProps);
         return config;
     }
 }
