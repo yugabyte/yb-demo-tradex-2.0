@@ -44,12 +44,12 @@ function roles_init(){
 
 function migration_build(){
   echo "Build migration docker image"
-  docker build $PROJECT_DIR/db -t $db_migration_image
+  docker build -f $PROJECT_DIR/db/Dockerfile -t $db_migration_image $PROJECT_DIR/db
 }
 
 function initializer_build(){
   echo "Build initializer docker image"
-  docker build -f ./Dockerfile-Initializer -t $db_initializer_image $PROJECT_DIR/db
+  docker build -f $PROJECT_DIR/db/Dockerfile-Initializer -t $db_initializer_image $PROJECT_DIR/db
 }
 
 function initializer_run(){
@@ -57,7 +57,7 @@ docker run --rm -it -e DB_HOST=$yb_container \
     --name $db_initializer_container \
     --hostname $db_initializer_container \
     --link $yb_container:$yb_container \
-    $db_initializer_image 
+    $db_initializer_image
 }
 
 function migration_run(){
