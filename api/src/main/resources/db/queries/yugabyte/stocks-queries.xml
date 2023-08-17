@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+    <entry key="STOCK_BY_SYMBOL_SQL">
+        <![CDATA[
+          select * from trade_symbol ts where ts.symbol = :psymbol
+        ]]>
+    </entry>
+
+    <entry key="STOCK_BY_ID_SQL">
+        <![CDATA[
+           select * from trade_symbol ts where ts.enabled = true and ts.trade_symbol_id = :symbolId
+        ]]>
+    </entry>
+
+    <entry key="STOCK_DAY_HISTORY_BY_ID_SQL">
+        <![CDATA[
+            select ts.symbol, th.price_time,th.high_price, th.low_price, th.open_price
+        	from trade_symbol_price_historic th, trade_symbol ts
+    		where th.trade_symbol_id = ts.trade_symbol_id and ts.trade_symbol_id = :symbolId and th.interval_period = :intervalPeriod;
+        ]]>
+    </entry>
+
+
+    <entry key="STOCK_HISTORY_BY_ID_BETWEEN_SQL">
+        <![CDATA[
+            select ts.symbol, th.price_time,th.high_price, th.low_price, th.open_price
+	        from trade_symbol_price_historic th, trade_symbol ts
+		    where th.trade_symbol_id = ts.trade_symbol_id and ts.trade_symbol_id = :symbolId and price_time between :fromDate and :toDate
+        ]]>
+    </entry>
+
+    <entry key="STOCK_TREND">
+        <![CDATA[
+    select symbol_id, trend from five_days_stock_trend_v
+     ]]>
+    </entry>
+
+    <entry key="ALL_ACTIVE_STOCKS">
+        <![CDATA[
+    select * from trade_symbol ts where ts.enabled = true order by trade_symbol_id
+    ]]>
+    </entry>
+
+    <entry key="APP_USER_FAV_STOCKS">
+        <![CDATA[
+    select ts.* from trade_symbol ts, app_user au  where ts.enabled = true and au.id = :userId and au.preferred_region = :prefRegion and ts.trade_symbol_id = any(au.favourites)
+ ]]>
+    </entry>
+
+</properties>

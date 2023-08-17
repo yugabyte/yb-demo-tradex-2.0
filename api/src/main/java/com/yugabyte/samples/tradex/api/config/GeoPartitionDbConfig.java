@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import javax.sql.DataSource;
 
 @Configuration
-@Profile("GEO")
+@Profile("GEO & yugabyte")
 public class GeoPartitionDbConfig {
 
     @Value("${app.geo-db.username}")
@@ -37,8 +37,7 @@ public class GeoPartitionDbConfig {
         geoHikariConfig.setPassword(password);
         geoHikariConfig.setJdbcUrl(loadBalance ? (jdbcUrl + "?load-balance=true&topology-keys=" + topologyKeys) : jdbcUrl);
         geoHikariConfig.setPoolName("geo-pool");
-        DataSource ybClusterAwareDataSource = new HikariDataSource(geoHikariConfig);
-        return ybClusterAwareDataSource;
+      return new HikariDataSource(geoHikariConfig);
 
     }
 

@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import javax.sql.DataSource;
 
 @Configuration
-@Profile("MR")
+@Profile("MR & yugabyte")
 public class MultiRegionDbConfig {
 
     @Autowired
@@ -40,8 +40,7 @@ public class MultiRegionDbConfig {
         config.setJdbcUrl(loadBalance ? (jdbcUrl + "?load-balance=true&topology-keys=" + topologyKeys) : jdbcUrl);
         config.setPoolName("mrmz-pool");
 
-        DataSource ybClusterAwareDataSource = new HikariDataSource(config);
-        return ybClusterAwareDataSource;
+      return new HikariDataSource(config);
 
     }
 
