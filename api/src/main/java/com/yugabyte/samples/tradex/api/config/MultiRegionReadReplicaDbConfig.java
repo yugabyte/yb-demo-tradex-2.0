@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import javax.sql.DataSource;
 
 @Configuration
-@Profile("MRRR & yugabyte")
+@Profile("MRR & yugabyte")
 public class MultiRegionReadReplicaDbConfig {
 
     @Autowired
