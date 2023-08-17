@@ -28,6 +28,11 @@ app:
 
     topology-keys: ${APP_SINGLE_DB_TP_KEYS}
 
+  orcl-srmz-db:
+    username: ${APP_SINGLE_ORCL_DB_USER}
+    password: ${APP_SINGLE_ORCL_DB_PWD}
+    jdbcUrl: ${APP_SINGLE_ORCL_DB_URL}
+
   mrmz-db:
     username: ${APP_MULTI_REGION_DB_USER}
     password: ${APP_MULTI_REGION_DB_PWD}
