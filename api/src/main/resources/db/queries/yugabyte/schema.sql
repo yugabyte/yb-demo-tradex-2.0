@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS APP_USER;
 drop table if exists trade_symbol_price_today;
 drop table if exists trade_symbol_price_historic;
 DROP TABLE IF EXISTS TRADE_ORDERS;
+
 DROP TABLE IF EXISTS REF_DATA;
 DROP TABLE IF EXISTS TRADE_SYMBOL;
 DROP SEQUENCE IF EXISTS TRADE_SYMBOL_SEQ;
