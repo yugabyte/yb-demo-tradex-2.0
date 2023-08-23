@@ -20,3 +20,4 @@ private/
 
 *.swp
 .env-private
+api/tradex-api.iml
