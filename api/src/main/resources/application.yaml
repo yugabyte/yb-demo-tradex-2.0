@@ -9,8 +9,7 @@ app:
   load_mock_data: ${APP_LOAD_MOCK_DATA:true}
   load_balance: ${APP_DB_LOADBALANCE}
   mylocation: ${APP_INSTANCE_LOCATION}
-#  datasource_types: SINGLE_REGION_MULTI_ZONE,MULTI_REGION_MULTI_ZONE,MULTI_REGION_READ_REPLICA,GEO_PARTITIONED
-  datasource_types: SINGLE_REGION_MULTI_ZONE
+  datasource_types: ${DATASOURCE_TYPES}
   security:
     jwt:
       secret: cccccclvkgnllrhrngucjbivrehvjcnkfvfihildhfcg
