@@ -450,7 +450,7 @@ update trade_symbol
 set price_time   = now(),
     created_date = now()
 where enabled = true;
-commit;
+
 truncate table trade_symbol_price_historic;
 
 INSERT INTO trade_symbol_price_historic (trade_symbol_id, price_time, open_price, low_price, high_price, price, interval_period)
