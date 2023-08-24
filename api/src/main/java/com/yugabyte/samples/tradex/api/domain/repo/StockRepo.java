@@ -15,7 +15,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -131,13 +130,12 @@ class TrendCacheRowMapper implements RowMapper<Pair<Integer, List<Double>>> {
     @Override
     public Pair<Integer, List<Double>> mapRow(ResultSet rs, int rowNum) throws SQLException {
         Integer stockId = rs.getInt("symbol_id");
-        List<Double> trend = new ArrayList<>(0);
 
-        BigDecimal[] array = (BigDecimal[]) rs.getArray("trend").getArray();
-
-        if (array != null) {
-            trend = Arrays.stream(array).map(BigDecimal::doubleValue).collect(Collectors.toList());
-        }
+        String[] array = rs.getObject("trend").toString()
+                .replace("[", "").replace("]", "")
+                .replace("{", "").replace("}", "")
+                .split(",");
+        List<Double> trend = Arrays.stream(array).map(Double::valueOf).collect(Collectors.toList());
 
         return Pair.of(stockId, trend);
     }

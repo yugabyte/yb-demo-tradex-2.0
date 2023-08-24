@@ -59,7 +59,6 @@ CREATE TABLE TRADE_SYMBOL(
   constraint TRADE_SYMBOL_PKEY primary key(TRADE_SYMBOL_ID)
   );
 
-
 CREATE TABLE TRADE_ORDERS (
   ORDER_ID integer DEFAULT ORDER_ID_SEQ.nextval NOT NULL,
   USER_ID integer NOT NULL,
@@ -86,178 +85,16 @@ CREATE TABLE TRADE_SYMBOL_PRICE_HISTORIC(
 truncate table REF_DATA;
 
 /*----- INSERT statements ---------*/
-insert into REF_DATA(KEY_NAME, KEY_VALUE) values ('TRAFFIC_LOCATIONS',
-'{"TRAFFIC_LOCATIONS":[
- {
-  "id": 1,
-  "name":"Boston",
-  "country":"United States",
-  "latitude":"42.36",
-  "longitude": "-71.05"
- },
- {
-  "id": 2,
-  "name":"Washington",
-  "country":"United States",
-  "latitude":"47.751",
-  "longitude": "-120.740"
- },
-{
-  "id": 3,
-  "name":"London",
-  "country":"United Kingdom",
-  "latitude":"51.509",
-  "longitude": "-0.118"
- },
-{
-  "id": 4,
-  "name":"Mumbai",
-  "country":"India",
-  "latitude":"19.076",
-  "longitude": "72.877"
- },
-{
-  "id": 5,
-  "name":"Sydney",
-  "country":"Australia",
-  "latitude":"-33.865",
-  "longitude": "151.209"
- }
-]
-}');
 
-insert into REF_DATA(KEY_NAME, KEY_VALUE) values( 'DB_CLUSTER_TYPES',
-'{
-	"DB_CLUSTER_TYPES": [
-	    {
-	        "id":0,
-			"title": "Single-region, multi-zone",
-			"subtitle": "3 node deployed in US West"
-		},
-		{
-		    "id":1,
-			"title": " Multi-region",
-			"subtitle": "3 nodes deployed in US West, US Central and US East"
-		},
-		{
-		  "id":2,
-			"title": " Multi-region, multi-zone with Read Replicas",
-			"subtitle": "3 nodes deployed in US East, with read replicas in Europe and Asia"
-		},
-		{
-			"id":3,
-			"title": " Geo-partitioned",
-			"subtitle": "3 nodes deployed in US East, with 2 nodes in Europe and Asia"
-		}
-    ]
-}'
-);
-
-insert into REF_DATA(KEY_NAME, KEY_VALUE) values( 'DEFAULT_NODE_LOCATIONS',
-'{
-	"DEFAULT_NODE_LOCATIONS": [
-	    {
-		  "id": 0,
-		  "name":"useast1",
-		  "country":"USA",
-		  "latitude":"38.13",
-		  "longitude": "-78.45"
-		 },
-		 {
-		  "id": 1,
-		  "name":"useast2",
-		  "country":"USA",
-		  "latitude":"39.96",
-		  "longitude": "-83"
-		 },
-		 {
-		  "id": 2,
-		  "name":"uswest1",
-		  "country":"USA",
-		  "latitude":"37.35",
-		  "longitude": "-121.96"
-		 },
-		 {
-		  "id": 3,
-		  "name":"uswest2",
-		  "country":"USA",
-		  "latitude":"46.15",
-		  "longitude": "-123.88"
-		 },
-		 {
-		  "id": 4,
-		  "name":"euwest1",
-		  "country":"Ireland",
-		  "latitude":"53",
-		  "longitude": "-8"
-		 },
-		 {
-		  "id": 5,
-		  "name":"euwest2",
-		  "country":"UK",
-		  "latitude":"51",
-		  "longitude": "-0.1"
-		 },
-		 {
-		  "id": 6,
-		  "name":"euwest3",
-		  "country":"FRANCE",
-		  "latitude":"48.86",
-		  "longitude": "2.35"
-		 },
-		 {
-		  "id": 7,
-		  "name":"eucentral1",
-		  "country":"GERMANY",
-		  "latitude":"50",
-		  "longitude": "8"
-		 },
-		 {
-		  "id": 8,
-		  "name":"apsoutheast1",
-		  "country":"SINGAPORE",
-		  "latitude":"1.32",
-		  "longitude": "103.69"
-		 },
-		{
-		  "id": 9,
-		  "name":"apsoutheast2",
-		  "country":"AUSTRALIA",
-		  "latitude":"-33.91",
-		  "longitude": "151.19"
-		 },
-		{
-		  "id": 10,
-		  "name":"apsouth1",
-		  "country":"INDIA",
-		  "latitude":"19.242",
-		  "longitude": "72.96"
-		 },
-		{
-		  "id": 11,
-		  "name":"apnortheast1",
-		  "country":"JAPAN",
-		  "latitude":"35.617",
-		  "longitude": "139.74"
-		 },
-		 {
-		  "id": 12,
-		  "name":"datacenter1",
-		  "country":"USA",
-		  "latitude":"38.13",
-		  "longitude": "-78.45"
-		 }
-    ]
-}'
-);
-
+insert into REF_DATA(KEY_NAME, KEY_VALUE) values( 'DB_CLUSTER_TYPES','{"DB_CLUSTER_TYPES":[{"id":0,"title": "Single-region, multi-zone","subtitle": "3 node deployed in US West"}]}');
 
 /*------- create views start here -----*/
 create or replace view five_days_stock_trend_v as (
-                                                  select trade_symbol_id as symbol_id, JSON_ARRAYAGG(trunc(high_price, 2) order by price_time desc) as trend
+                                                  select trade_symbol_id as symbol_id, JSON_ARRAYAGG(trunc(high_price, 2) order by price_time DESC) as trend
                                                   from trade_symbol_price_historic tsph
                                                   where interval_period = '1DAY' group by trade_symbol_id
                                                     );
+
 
 create or replace view current_stocks_v as (
                                            select o.user_id, o.preferred_region, o.symbol_id,
@@ -273,7 +110,6 @@ create or replace view stock_period_info_v as (
 
 
 TRUNCATE TABLE TRADE_SYMBOL;
-
 
 INSERT INTO trade_symbol (symbol,company,exchange,enabled,created_date) VALUES ('INTC','Intel','NYSE',0,TIMESTAMP '2022-11-01 12:52:45.944782');
 INSERT INTO trade_symbol (symbol,company,exchange,enabled,created_date) VALUES ('MS','Morgan Stanley','NYSE',0,TIMESTAMP '2022-11-01 12:52:45.944782');
@@ -413,6 +249,8 @@ insert into trade_symbol (trade_symbol_id,symbol,company,exchange,price_time,ope
 insert into trade_symbol (trade_symbol_id,symbol,company,exchange,price_time,open_price,low_price,high_price,close_price,market_cap,volume,avg_volume,enabled,created_date) values (95,'TSLA','Tesla','NYSE',TIMESTAMP '2023-01-24 04:48:06.060002',135.8700,134.2700,145.3790,133.4200,453926551552.0000,201802953.0000,127514222.0000,1,TIMESTAMP '2022-11-01 12:52:45.944782');
 insert into trade_symbol (trade_symbol_id,symbol,company,exchange,price_time,open_price,low_price,high_price,close_price,market_cap,volume,avg_volume,enabled,created_date) values (20,'ADP','Automatic Data Processing','NYSE',TIMESTAMP '2023-01-24 04:47:26.463123',236.4800,235.4400,241.8600,237.1700,99956957184.0000,1654699.0000,1667572.0000,1,TIMESTAMP '2022-11-01 12:52:45.944782');
 
+
+SELECT * FROM TRADE_SYMBOL WHERE enabled = 1 ORDER BY trade_symbol_id desc;
 update trade_symbol set price_time = CURRENT_TIMESTAMP, created_date = CURRENT_TIMESTAMP where enabled = 1;
 
 
@@ -1225,5 +1063,3 @@ INSERT INTO app_user (email,passkey,enabled,personal_details,user_notifications,
 INSERT INTO app_user (email,passkey,enabled,personal_details,user_notifications,preferred_region,SECURITY_PIN,created_date,updated_date) VALUES ('molly@tradex.com','$2a$10$ZP4jvGcjlgVyl5XcStQox.wO6mR/kDb0L5ubGniOOvLT6OfYebG8G',1,'{"fullName":"molly moe", "address":"dalal street", "phone":"+9178900009", "country":"INDIA", "gender":"FEMALE"}','{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}','mumbai',8888, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO app_user (email,passkey,enabled,personal_details,user_notifications,preferred_region,SECURITY_PIN,created_date,updated_date) VALUES ('leo@tradex.com','$2a$10$kb/IL57Tb8MJsgzTk07egOgs4u/dATz717Ku1rpWFz1EstHfXZZqy',1,'{"fullName":"leo lance", "address":"10 Downing Street", "phone":"+4478900009", "country":"UK", "gender":"MALE"}','{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}','london',8888, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO app_user (email,passkey,enabled,personal_details,user_notifications,preferred_region,SECURITY_PIN,created_date,updated_date) VALUES ('scrooge@tradex.com','$2a$10$8Vo.rS0D5zUt8m7QdiTN4.TQ01Rcw2FWQH1eQ1OH/94ivpcfL9Kue',1,'{"fullName":"uncle scrooge", "address":"Vault Street", "phone":"+178900009", "country":"USA", "gender":"MALE"}','{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}','washington',9999, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
-

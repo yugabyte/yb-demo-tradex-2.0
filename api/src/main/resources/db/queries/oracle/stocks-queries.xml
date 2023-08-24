@@ -10,7 +10,7 @@
 
     <entry key="STOCK_BY_ID_SQL">
         <![CDATA[
-           select * from trade_symbol ts where ts.enabled = true and ts.trade_symbol_id = :symbolId
+           select * from trade_symbol ts where ts.enabled = 1 and ts.trade_symbol_id = :symbolId
         ]]>
     </entry>
 
@@ -39,13 +39,13 @@
 
     <entry key="ALL_ACTIVE_STOCKS">
         <![CDATA[
-    select * from trade_symbol ts where ts.enabled = true order by trade_symbol_id
+    select * from trade_symbol ts where ts.enabled = 1 order by trade_symbol_id
     ]]>
     </entry>
 
     <entry key="APP_USER_FAV_STOCKS">
         <![CDATA[
-    select ts.* from trade_symbol ts, app_user au  where ts.enabled = true and au.id = :userId and au.preferred_region = :prefRegion and ts.trade_symbol_id = any(au.favourites)
+    select ts.* from trade_symbol ts, app_user au  where ts.enabled = 1 and au.id = :userId and au.preferred_region = :prefRegion and ts.trade_symbol_id = any(au.favourites)
  ]]>
     </entry>
 
