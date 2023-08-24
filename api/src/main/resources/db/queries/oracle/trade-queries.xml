@@ -25,7 +25,7 @@
 
   <entry key="FETCH_USER_TRADES">
     <![CDATA[
-        SELECT * FROM trade_orders t WHERE t.preferred_region = :prefRegion AND t.user_id = :pUserId AND t.order_id > :prevId ORDER BY t.order_time DESC LIMIT :plimit
+        SELECT * FROM trade_orders t WHERE t.preferred_region = :prefRegion AND t.user_id = :pUserId AND t.order_id > :prevId ORDER BY t.order_time DESC FETCH FIRST :plimit ROWS ONLY
     ]]>
   </entry>
 

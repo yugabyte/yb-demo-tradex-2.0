@@ -3,7 +3,7 @@ DROP TABLE REF_DATA;
 DROP TABLE TRADE_SYMBOL;
 DROP TABLE TRADE_ORDERS;
 DROP TABLE TRADE_SYMBOL_PRICE_HISTORIC;
-DROP TABLE ORCL_SERVERS;
+DROP TABLE DB_SERVERS;
 
 
 CREATE TABLE APP_USER (
@@ -77,13 +77,15 @@ CREATE TABLE TRADE_SYMBOL_PRICE_HISTORIC(
 );
 
 /* ------This is a dummy table ---- */
-CREATE TABLE ORCL_SERVERS (
+CREATE TABLE DB_SERVERS (
 	id varchar(20),
+	host varchar(20),
+	cloud varchar(20),
 	region varchar(20),
 	zone varchar(20),
 	node_type varchar(20)
 );
-INSERT INTO ORCL_SERVERS VALUES('1', 'datacenter1', 'useast1a', 'singlenode');
+INSERT INTO DB_SERVERS VALUES('1', 'oracle', 'aws-rds-orcl', 'datacenter1', 'useast1a', 'singlenode');
 
 truncate table REF_DATA;
 

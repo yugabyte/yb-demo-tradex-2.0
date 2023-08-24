@@ -10,7 +10,7 @@
 
     <entry key="FETCH_DB_NODES">
         <![CDATA[
-       select region, zone, node_type from orcl_servers
+       select region, zone, node_type from DB_SERVERS
     ]]>
     </entry>
 

@@ -72,7 +72,7 @@
            insert into app_user(preferred_region,email, passkey, enabled, user_language,
           personal_details,user_notifications,security_pin, created_date,updated_date) values
           ( :prefRegion, :uemail, :upasswd, :uenabled, :ulang, cast (:upersonaldet as json) ,
-           cast ( :unotifications as json), :usecuritypin, now(), now()) returning ID, PREFERRED_REGION
+           cast ( :unotifications as json), :usecuritypin, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) returning ID, PREFERRED_REGION
     ]]>
     </entry>
 
