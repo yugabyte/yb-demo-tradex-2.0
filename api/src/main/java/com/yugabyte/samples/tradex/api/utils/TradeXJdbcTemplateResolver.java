@@ -3,7 +3,6 @@ package com.yugabyte.samples.tradex.api.utils;
 import com.yugabyte.samples.tradex.api.config.TradeXDataSourceType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
