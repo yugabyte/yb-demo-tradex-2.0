@@ -82,6 +82,15 @@ CREATE TABLE TRADE_SYMBOL_PRICE_HISTORIC(
     INTERVAL_PERIOD VARCHAR(6) NOT NULL CHECK( INTERVAL_PERIOD IN ('1H', '90MIN', '1DAY', '1WEEK', '3MONTH'))
 );
 
+/* ------This is a dummy table ---- */
+CREATE TABLE ORCL_SERVERS (
+	id varchar(20),
+	region varchar(20),
+	zone varchar(20),
+	node_type varchar(20)
+);
+INSERT INTO ORCL_SERVERS VALUES('1', 'datacenter1', 'useast1a', 'singlenode');
+
 truncate table REF_DATA;
 
 /*----- INSERT statements ---------*/
