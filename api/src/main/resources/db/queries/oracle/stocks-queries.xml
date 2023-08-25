@@ -16,18 +16,14 @@
 
     <entry key="STOCK_DAY_HISTORY_BY_ID_SQL">
         <![CDATA[
-            select ts.symbol, th.price_time,th.high_price, th.low_price, th.open_price
-        	from trade_symbol_price_historic th, trade_symbol ts
-    		where th.trade_symbol_id = ts.trade_symbol_id and ts.trade_symbol_id = :symbolId and th.interval_period = :intervalPeriod;
+            select ts.symbol, th.price_time,th.high_price, th.low_price, th.open_price from trade_symbol_price_historic th, trade_symbol ts where th.trade_symbol_id = ts.trade_symbol_id and ts.trade_symbol_id = :symbolId and th.interval_period = :intervalPeriod
         ]]>
     </entry>
 
 
     <entry key="STOCK_HISTORY_BY_ID_BETWEEN_SQL">
         <![CDATA[
-            select ts.symbol, th.price_time,th.high_price, th.low_price, th.open_price
-	        from trade_symbol_price_historic th, trade_symbol ts
-		    where th.trade_symbol_id = ts.trade_symbol_id and ts.trade_symbol_id = :symbolId and price_time between :fromDate and :toDate
+            select ts.symbol, th.price_time,th.high_price, th.low_price, th.open_price from trade_symbol_price_historic th, trade_symbol ts where th.trade_symbol_id = ts.trade_symbol_id and ts.trade_symbol_id = :symbolId and price_time between :fromDate and :toDate
         ]]>
     </entry>
 

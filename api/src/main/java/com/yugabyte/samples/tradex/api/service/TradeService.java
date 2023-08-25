@@ -115,8 +115,8 @@ public class TradeService {
         parameterSource.addValue("payMethod", newTradeOrder.getPayMethod().name());
         parameterSource.addValue("order_time", LocalDateTime.now());
 
-
-        template.update(queryProvider.getTradeSQL(TradeSql.INSERT_TRADE), parameterSource, keyHolder);
+        String[] keyColumnNames = {"ORDER_ID"};
+        template.update(queryProvider.getTradeSQL(TradeSql.INSERT_TRADE), parameterSource, keyHolder, keyColumnNames);
 
         log.info("Inserted Trade id: {}", keyHolder.getKey());
         return Objects.requireNonNull(keyHolder.getKey()).intValue();

@@ -4,16 +4,14 @@
 <properties>
   <entry key="INSERT_TRADE">
     <![CDATA[
-        INSERT INTO trade_orders (user_id, symbol_id, trade_type, order_time, bid_price, preferred_region, stock_units, pay_method)
-          VALUES ( :userId, :symbolId, :tradeType, :order_time, :bidPrice, :preferredRegion, :stockUnits, :payMethod) returning order_id
+        INSERT INTO trade_orders (user_id, symbol_id, trade_type, order_time, bid_price, preferred_region, stock_units, pay_method) VALUES ( :userId, :symbolId, :tradeType, :order_time, :bidPrice, :preferredRegion, :stockUnits, :payMethod)
     ]]>
   </entry>
 
 
   <entry key="BULK_INSERT_TRADE">
     <![CDATA[
-        INSERT INTO trade_orders (user_id, symbol_id, trade_type, order_time, bid_price, preferred_region, stock_units, pay_method)
-          VALUES ( ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT ALL INTO trade_orders (user_id, symbol_id, trade_type, order_time, bid_price, preferred_region, stock_units, pay_method) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?) SELECT 1 FROM DUAL
     ]]>
   </entry>
 
