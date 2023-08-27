@@ -5,7 +5,6 @@ import com.yugabyte.samples.tradex.api.utils.TradeXJdbcTemplateResolver;
 import com.yugabyte.samples.tradex.api.web.dto.ConnectionInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -19,10 +18,6 @@ import java.util.HashMap;
 public class ConnectionInfoRepo {
 
     final String FETCH_CONN_INFO_SQL = """
-            SELECT host, cloud,zone,region, num_connections,node_type FROM yb_servers() where host = host(inet_server_addr())
-            """;
-
-    final String FETCH_DUMMY_CONN_INFO_SQL = """
             SELECT host, cloud, zone, region FROM DB_SERVERS
             """;
     @Autowired
@@ -31,25 +26,13 @@ public class ConnectionInfoRepo {
     public ConnectionInfo fetchConnectionDetails(TradeXDataSourceType dbType, String partKey) {
 
         NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-        ConnectionInfo connectionInfo = null;
-        try {
-            connectionInfo = template.queryForObject(FETCH_CONN_INFO_SQL,
-                    new HashMap(0), (RowMapper<ConnectionInfo>) (rs, rowNum) -> new ConnectionInfo(
-                            rs.getString("host"),
-                            rs.getString("cloud"),
-                            rs.getString("region"),
-                            rs.getString("zone"),
-                            TradeXDataSourceType.GEO_PARTITIONED.equals(dbType) ? partKey : ""));
-            
-        } catch (BadSqlGrammarException ex) {
-            connectionInfo = template.queryForObject(FETCH_DUMMY_CONN_INFO_SQL,
-                    new HashMap(0), (RowMapper<ConnectionInfo>) (rs, rowNum) -> new ConnectionInfo(
-                            rs.getString("host"),
-                            rs.getString("cloud"),
-                            rs.getString("region"),
-                            rs.getString("zone"),
-                            TradeXDataSourceType.SINGLE_REGION_MULTI_ZONE.equals(dbType) ? partKey : ""));
-        }
+        ConnectionInfo connectionInfo = template.queryForObject(FETCH_CONN_INFO_SQL,
+                new HashMap(0), (RowMapper<ConnectionInfo>) (rs, rowNum) -> new ConnectionInfo(
+                        rs.getString("host"),
+                        rs.getString("cloud"),
+                        rs.getString("region"),
+                        rs.getString("zone"), TradeXDataSourceType.SINGLE_REGION_MULTI_ZONE.equals(dbType) ? partKey : ""));
+
         return connectionInfo;
     }
 }
