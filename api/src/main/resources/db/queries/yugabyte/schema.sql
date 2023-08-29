@@ -18,7 +18,7 @@ CREATE TABLE APP_USER
   ID                 SERIAL,
   EMAIL              VARCHAR(50),
   PASSKEY            VARCHAR(100) NOT NULL,
-  ENABLED            BOOLEAN      NOT NULL DEFAULT TRUE,
+  ENABLED            SMALLINT      NOT NULL DEFAULT 1,
   PERSONAL_DETAILS   VARCHAR(4000)         NOT NULL,
   USER_LANGUAGE      VARCHAR(50)           DEFAULT 'EN-UK',
   USER_NOTIFICATIONS VARCHAR(4000)         NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE TRADE_SYMBOL
   market_cap      decimal(22, 4),
   volume          decimal(22, 4),
   avg_volume      decimal(22, 4),
-  ENABLED         boolean,
+  ENABLED         smallint,
   CREATED_DATE    timestamp        default now(),
   UNIQUE (SYMBOL),
   constraint TRADE_SYMBOL_PKEY primary key (TRADE_SYMBOL_ID)
@@ -289,167 +289,166 @@ values ('DEFAULT_NODE_LOCATIONS',
           ]
         }');
 
+INSERT INTO trade_symbol (symbol, company, exchange, enabled, created_date)
+VALUES ('INTC', 'Intel', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('MS', 'Morgan Stanley', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('BHP', 'BHP Group', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('BRK.A', 'Berkshire Hathaway', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('GOOGL', 'Alphabet', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('FMX', 'Fomento Economico Mexicano', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('JPM', 'JPMorgan Chase & Co.', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('UL', 'Unilever', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('QCOM', 'Qualcomm', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('WFC', 'Wells Fargo & Company', 'NYSE', 0, '2022-11-01 12:52:45.944782');
 
 INSERT INTO trade_symbol (symbol, company, exchange, enabled, created_date)
-VALUES ('INTC', 'Intel', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('MS', 'Morgan Stanley', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('BHP', 'BHP Group', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('BRK.A', 'Berkshire Hathaway', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('GOOGL', 'Alphabet', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('FMX', 'Fomento Economico Mexicano', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('JPM', 'JPMorgan Chase & Co.', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('UL', 'Unilever', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('QCOM', 'Qualcomm', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('WFC', 'Wells Fargo & Company', 'NYSE', false, '2022-11-01 12:52:45.944782');
+VALUES ('ORCL', 'Oracle', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('CAT', 'Caterpillar', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('TXN', 'Texas Instruments', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('AMGN', 'Amgen', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('CVX', 'Chevron', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('ABBV', 'AbbVie', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('NVS', 'Novartis AG', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('TMUS', 'T-Mobile US', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('AXP', 'American Express Company', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('ADP', 'Automatic Data Processing', 'NYSE', 1, '2022-11-01 12:52:45.944782');
 
 INSERT INTO trade_symbol (symbol, company, exchange, enabled, created_date)
-VALUES ('ORCL', 'Oracle', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('CAT', 'Caterpillar', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('TXN', 'Texas Instruments', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('AMGN', 'Amgen', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('CVX', 'Chevron', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('ABBV', 'AbbVie', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('NVS', 'Novartis AG', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('TMUS', 'T-Mobile US', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('AXP', 'American Express Company', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('ADP', 'Automatic Data Processing', 'NYSE', true, '2022-11-01 12:52:45.944782');
+VALUES ('SPGI', 'S&P Global', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('NVDA', 'NVIDIA', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('PM', 'Philip Morris International', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('META', 'Meta Platforms', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('IBM', 'International Business Machines', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('ABT', 'Abbott Laboratories', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('AMD', 'Advanced Micro Devices', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('TSM', 'Taiwan Semiconductor Manufacturing Company', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('BABA', 'Alibaba Group Holding', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('UNH', 'UnitedHealth Group', 'NYSE', 1, '2022-11-01 12:52:45.944782');
 
 INSERT INTO trade_symbol (symbol, company, exchange, enabled, created_date)
-VALUES ('SPGI', 'S&P Global', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('NVDA', 'NVIDIA', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('PM', 'Philip Morris International', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('META', 'Meta Platforms', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('IBM', 'International Business Machines', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('ABT', 'Abbott Laboratories', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('AMD', 'Advanced Micro Devices', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('TSM', 'Taiwan Semiconductor Manufacturing Company', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('BABA', 'Alibaba Group Holding', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('UNH', 'UnitedHealth Group', 'NYSE', true, '2022-11-01 12:52:45.944782');
+VALUES ('ADBE', 'Adobe', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('JNJ', 'Johnson & Johnson', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('PBR.A', 'Petroleo Brasileiro', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('AZN', 'AstraZeneca', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('VZ', 'Verizon Communications', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('MCD', 'McDonalds', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('BMY', 'Bristol-Myers Squibb Company', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('COP', 'ConocoPhillips', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('V', 'Visa Inc.', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('TD', 'The Toronto-Dominion Bank', 'NYSE', 0, '2022-11-01 12:52:45.944782');
 
 INSERT INTO trade_symbol (symbol, company, exchange, enabled, created_date)
-VALUES ('ADBE', 'Adobe', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('JNJ', 'Johnson & Johnson', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('PBR.A', 'Petroleo Brasileiro', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('AZN', 'AstraZeneca', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('VZ', 'Verizon Communications', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('MCD', 'McDonalds', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('BMY', 'Bristol-Myers Squibb Company', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('COP', 'ConocoPhillips', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('V', 'Visa Inc.', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('TD', 'The Toronto-Dominion Bank', 'NYSE', false, '2022-11-01 12:52:45.944782');
+VALUES ('SBUX', 'Starbucks', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('ELV', 'Elevance Health', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('HSBC', 'HSBC Holdings', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('LMT', 'Lockheed Martin', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('TTE', 'TotalEnergies SE', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('BP', 'BP plc', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('PG', 'The Procter & Gamble Company', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('WMT', 'Walmart', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('UNP', 'Union Pacific', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('HD', 'The Home Depot', 'NYSE', 0, '2022-11-01 12:52:45.944782');
 
 INSERT INTO trade_symbol (symbol, company, exchange, enabled, created_date)
-VALUES ('SBUX', 'Starbucks', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('ELV', 'Elevance Health', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('HSBC', 'HSBC Holdings', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('LMT', 'Lockheed Martin', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('TTE', 'TotalEnergies SE', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('BP', 'BP plc', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('PG', 'The Procter & Gamble Company', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('WMT', 'Walmart', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('UNP', 'Union Pacific', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('HD', 'The Home Depot', 'NYSE', false, '2022-11-01 12:52:45.944782');
+VALUES ('DHR', 'Danaher', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('CMCSA', 'Comcast', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('CVS', 'CVS Health', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('AVGO', 'Broadcom', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('UPS', 'United Parcel Service', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('NEE', 'NextEra Energy', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('KO', 'The Coca-Cola Company', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('T', 'AT&T', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('BX', 'Blackstone', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('BRK.B', 'Berkshire Hathaway', 'NYSE', 0, '2022-11-01 12:52:45.944782');
 
 INSERT INTO trade_symbol (symbol, company, exchange, enabled, created_date)
-VALUES ('DHR', 'Danaher', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('CMCSA', 'Comcast', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('CVS', 'CVS Health', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('AVGO', 'Broadcom', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('UPS', 'United Parcel Service', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('NEE', 'NextEra Energy', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('KO', 'The Coca-Cola Company', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('T', 'AT&T', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('BX', 'Blackstone', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('BRK.B', 'Berkshire Hathaway', 'NYSE', false, '2022-11-01 12:52:45.944782');
+VALUES ('MA', 'Mastercard', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('HON', 'Honeywell International', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('SHEL', 'Shell', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('RY', 'Royal Bank of Canada', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('NKE', 'Nike', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('SNY', 'Sanofi', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('CSCO', 'Cisco Systems', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('DE', 'Deere & Company', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('EQNR', 'Equinor ASA', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('RTX', 'Raytheon Technologies', 'NYSE', 1, '2022-11-01 12:52:45.944782');
 
 INSERT INTO trade_symbol (symbol, company, exchange, enabled, created_date)
-VALUES ('MA', 'Mastercard', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('HON', 'Honeywell International', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('SHEL', 'Shell', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('RY', 'Royal Bank of Canada', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('NKE', 'Nike', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('SNY', 'Sanofi', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('CSCO', 'Cisco Systems', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('DE', 'Deere & Company', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('EQNR', 'Equinor ASA', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('RTX', 'Raytheon Technologies', 'NYSE', true, '2022-11-01 12:52:45.944782');
+VALUES ('NFLX', 'Netflix', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('COST', 'Costco Wholesale', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('HDB', 'HDFC Bank', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('AMZN', 'Amazon.com', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('XOM', 'Exxon Mobil', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('CRM', 'Salesforce.com', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('GS', 'The Goldman Sachs Group', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('LLY', 'Eli Lilly and Company', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('TM', 'Toyota Motor', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('LIN', 'Linde', 'NYSE', 0, '2022-11-01 12:52:45.944782');
 
 INSERT INTO trade_symbol (symbol, company, exchange, enabled, created_date)
-VALUES ('NFLX', 'Netflix', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('COST', 'Costco Wholesale', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('HDB', 'HDFC Bank', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('AMZN', 'Amazon.com', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('XOM', 'Exxon Mobil', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('CRM', 'Salesforce.com', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('GS', 'The Goldman Sachs Group', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('LLY', 'Eli Lilly and Company', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('TM', 'Toyota Motor', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('LIN', 'Linde', 'NYSE', false, '2022-11-01 12:52:45.944782');
+VALUES ('PYPL', 'PayPal Holdings', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('PFE', 'Pfizer', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('MRK', 'Merck & Co.', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('NVO', 'Novo Nordisk', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('MDT', 'Medtronic plc.', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('ACN', 'Accenture', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('SCHW', 'The Charles Schwab Corporation', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('TMO', 'Thermo Fisher Scientific', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('INTU', 'Intuit', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('DIS', 'The Walt Disney Company', 'NYSE', 0, '2022-11-01 12:52:45.944782');
 
 INSERT INTO trade_symbol (symbol, company, exchange, enabled, created_date)
-VALUES ('PYPL', 'PayPal Holdings', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('PFE', 'Pfizer', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('MRK', 'Merck & Co.', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('NVO', 'Novo Nordisk', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('MDT', 'Medtronic plc.', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('ACN', 'Accenture', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('SCHW', 'The Charles Schwab Corporation', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('TMO', 'Thermo Fisher Scientific', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('INTU', 'Intuit', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('DIS', 'The Walt Disney Company', 'NYSE', false, '2022-11-01 12:52:45.944782');
-
-INSERT INTO trade_symbol (symbol, company, exchange, enabled, created_date)
-VALUES ('ASML', 'ASML Holding', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('LOW', 'Lowes Companies', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('SAP', 'SAP SE', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('PBR', 'Petroleo Brasileiro', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('TSLA', 'Tesla', 'NYSE', true, '2022-11-01 12:52:45.944782'),
-       ('PEP', 'PepsiCo', 'NYSE', false, '2022-11-01 12:52:45.944782'),
-       ('BAC', 'Bank of America', 'NYSE', false, '2022-11-01 12:52:45.944782');
+VALUES ('ASML', 'ASML Holding', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('LOW', 'Lowes Companies', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('SAP', 'SAP SE', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('PBR', 'Petroleo Brasileiro', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('TSLA', 'Tesla', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
+       ('PEP', 'PepsiCo', 'NYSE', 0, '2022-11-01 12:52:45.944782'),
+       ('BAC', 'Bank of America', 'NYSE', 0, '2022-11-01 12:52:45.944782');
 
 INSERT INTO app_user (email, passkey, enabled, personal_details, user_notifications, preferred_region, SECURITY_PIN, created_date, updated_date)
-VALUES ('mickey@tradex.com', '$2a$10$.F2QPGfG8YzHRqQ1o5uuLeHiWPxLwinmFz67TIEg.4VS8PHITiHxy', true, '{"fullName":"mickey mouse", "address":"wallstreet", "phone":"+10000007", "country":"USA", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED" }', 'boston', 9999, '2022-10-26 11:30:47.624492', '2022-10-26 11:30:47.624492'),
-       ('donald@tradex.com', '$2a$10$wK4JTnG6H02BkTBpyqbfi.O1YyMC.81FM1biSEtrvqRbA005/mR.m', true, '{"fullName":"donald duck", "address":"wallstreet", "phone":"+10000009", "country":"USA", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'sydney', 8888, '2022-10-26 11:31:41.758602', '2022-10-26 11:31:41.758602');
+VALUES ('mickey@tradex.com', '$2a$10$.F2QPGfG8YzHRqQ1o5uuLeHiWPxLwinmFz67TIEg.4VS8PHITiHxy', 1, '{"fullName":"mickey mouse", "address":"wallstreet", "phone":"+10000007", "country":"USA", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED" }', 'boston', 9999, '2022-10-26 11:30:47.624492', '2022-10-26 11:30:47.624492'),
+       ('donald@tradex.com', '$2a$10$wK4JTnG6H02BkTBpyqbfi.O1YyMC.81FM1biSEtrvqRbA005/mR.m', 1, '{"fullName":"donald duck", "address":"wallstreet", "phone":"+10000009", "country":"USA", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'sydney', 8888, '2022-10-26 11:31:41.758602', '2022-10-26 11:31:41.758602');
 
 delete
 from trade_symbol
-where enabled = true;
+where enabled = 1;
 
 insert into trade_symbol (trade_symbol_id, symbol, company, exchange, price_time, open_price, low_price, high_price, close_price, market_cap, volume, avg_volume, enabled, created_date)
-values (45, 'TTE', 'TotalEnergies SE', 'NYSE', '2023-01-24 04:48:10.912648', 64.0100, 63.9100, 64.5300, 63.8000, 158704058368.0000, 1134656.0000, 1644714.0000, true, '2022-11-01 12:52:45.944782'),
-       (5, 'GOOGL', 'Alphabet', 'NYSE', '2023-01-24 04:47:44.696781', 97.9500, 97.5000, 100.0400, 98.0200, 1299385548800.0000, 40005055.0000, 33779885.0000, true, '2022-11-01 12:52:45.944782'),
-       (43, 'HSBC', 'HSBC Holdings', 'NYSE', '2023-01-24 04:47:47.141401', 36.6100, 36.5900, 36.8200, 36.8400, 147046924288.0000, 2078983.0000, 2433242.0000, true, '2022-11-01 12:52:45.944782'),
-       (86, 'ACN', 'Accenture', 'NYSE', '2023-01-24 04:47:24.180433', 278.5600, 277.4330, 282.8700, 280.4700, 176053469184.0000, 2584085.0000, 2180232.0000, true, '2022-11-01 12:52:45.944782'),
-       (91, 'ASML', 'ASML Holding', 'NYSE', '2023-01-24 04:47:30.902759', 658.0500, 656.9300, 676.2800, 648.8500, 272532717568.0000, 1780878.0000, 1194713.0000, true, '2022-11-01 12:52:45.944782'),
-       (16, 'ABBV', 'AbbVie', 'NYSE', '2023-01-24 04:47:20.165289', 149.8600, 148.0540, 150.4300, 149.5900, 262707707904.0000, 7562370.0000, 5574046.0000, true, '2022-11-01 12:52:45.944782'),
-       (15, 'CVX', 'Chevron', 'NYSE', '2023-01-24 04:47:37.925931', 181.2100, 180.0300, 182.5460, 180.9000, 349331390464.0000, 7635682.0000, 7833039.0000, true, '2022-11-01 12:52:45.944782'),
-       (6, 'FMX', 'Fomento Economico Mexicano', 'NYSE', '2023-01-24 04:47:42.364776', 84.6100, 84.3200, 86.4100, 84.1300, 149177925632.0000, 376308.0000, 594436.0000, true, '2022-11-01 12:52:45.944782'),
-       (51, 'DHR', 'Danaher', 'NYSE', '2023-01-24 04:47:40.157442', 273.9500, 272.3800, 279.3200, 274.4000, 201645752320.0000, 2005546.0000, 2566947.0000, true, '2022-11-01 12:52:45.944782'),
-       (7, 'JPM', 'JPMorgan Chase & Co.', 'NYSE', '2023-01-24 04:47:52.06264', 135.1150, 134.8200, 137.9600, 135.0800, 402791366656.0000, 10394887.0000, 10676009.0000, true, '2022-11-01 12:52:45.944782');
+values (45, 'TTE', 'TotalEnergies SE', 'NYSE', '2023-01-24 04:48:10.912648', 64.0100, 63.9100, 64.5300, 63.8000, 158704058368.0000, 1134656.0000, 1644714.0000, 1, '2022-11-01 12:52:45.944782'),
+       (5, 'GOOGL', 'Alphabet', 'NYSE', '2023-01-24 04:47:44.696781', 97.9500, 97.5000, 100.0400, 98.0200, 1299385548800.0000, 40005055.0000, 33779885.0000, 1, '2022-11-01 12:52:45.944782'),
+       (43, 'HSBC', 'HSBC Holdings', 'NYSE', '2023-01-24 04:47:47.141401', 36.6100, 36.5900, 36.8200, 36.8400, 147046924288.0000, 2078983.0000, 2433242.0000, 1, '2022-11-01 12:52:45.944782'),
+       (86, 'ACN', 'Accenture', 'NYSE', '2023-01-24 04:47:24.180433', 278.5600, 277.4330, 282.8700, 280.4700, 176053469184.0000, 2584085.0000, 2180232.0000, 1, '2022-11-01 12:52:45.944782'),
+       (91, 'ASML', 'ASML Holding', 'NYSE', '2023-01-24 04:47:30.902759', 658.0500, 656.9300, 676.2800, 648.8500, 272532717568.0000, 1780878.0000, 1194713.0000, 1, '2022-11-01 12:52:45.944782'),
+       (16, 'ABBV', 'AbbVie', 'NYSE', '2023-01-24 04:47:20.165289', 149.8600, 148.0540, 150.4300, 149.5900, 262707707904.0000, 7562370.0000, 5574046.0000, 1, '2022-11-01 12:52:45.944782'),
+       (15, 'CVX', 'Chevron', 'NYSE', '2023-01-24 04:47:37.925931', 181.2100, 180.0300, 182.5460, 180.9000, 349331390464.0000, 7635682.0000, 7833039.0000, 1, '2022-11-01 12:52:45.944782'),
+       (6, 'FMX', 'Fomento Economico Mexicano', 'NYSE', '2023-01-24 04:47:42.364776', 84.6100, 84.3200, 86.4100, 84.1300, 149177925632.0000, 376308.0000, 594436.0000, 1, '2022-11-01 12:52:45.944782'),
+       (51, 'DHR', 'Danaher', 'NYSE', '2023-01-24 04:47:40.157442', 273.9500, 272.3800, 279.3200, 274.4000, 201645752320.0000, 2005546.0000, 2566947.0000, 1, '2022-11-01 12:52:45.944782'),
+       (7, 'JPM', 'JPMorgan Chase & Co.', 'NYSE', '2023-01-24 04:47:52.06264', 135.1150, 134.8200, 137.9600, 135.0800, 402791366656.0000, 10394887.0000, 10676009.0000, 1, '2022-11-01 12:52:45.944782');
 
 insert into trade_symbol (trade_symbol_id, symbol, company, exchange, price_time, open_price, low_price, high_price, close_price, market_cap, volume, avg_volume, enabled, created_date)
-values (32, 'JNJ', 'Johnson & Johnson', 'NYSE', '2023-01-24 04:47:49.639672', 169.1000, 167.9470, 169.6300, 168.7400, 440043110400.0000, 8398461.0000, 6461881.0000, true, '2022-11-01 12:52:45.944782'),
-       (48, 'WMT', 'Walmart', 'NYSE', '2023-01-24 04:48:18.101977', 140.4600, 140.2000, 143.0100, 140.5400, 384671547392.0000, 4377999.0000, 6335368.0000, true, '2022-11-01 12:52:45.944782'),
-       (19, 'AXP', 'American Express Company', 'NYSE', '2023-01-24 04:47:33.205083', 152.0000, 151.5500, 155.0600, 151.6000, 115073884160.0000, 3281304.0000, 2819185.0000, true, '2022-11-01 12:52:45.944782'),
-       (70, 'RTX', 'Raytheon Technologies', 'NYSE', '2023-01-24 04:47:56.718921', 94.8000, 94.5100, 96.9300, 94.3600, 141493272576.0000, 5595639.0000, 4559396.0000, true, '2022-11-01 12:52:45.944782'),
-       (66, 'SNY', 'Sanofi', 'NYSE', '2023-01-24 04:48:03.80486', 48.8300, 48.5600, 48.9500, 49.0800, 122288898048.0000, 2880556.0000, 2583342.0000, true, '2022-11-01 12:52:45.944782'),
-       (30, 'UNH', 'UnitedHealth Group', 'NYSE', '2023-01-24 04:48:13.486651', 486.6800, 481.3900, 490.1000, 486.7200, 453916065792.0000, 3395268.0000, 3336737.0000, true, '2022-11-01 12:52:45.944782'),
-       (75, 'XOM', 'Exxon Mobil', 'NYSE', '2023-01-24 04:48:20.530362', 113.6400, 112.6400, 114.5900, 113.3500, 464378363904.0000, 16440556.0000, 17573627.0000, true, '2022-11-01 12:52:45.944782'),
-       (63, 'SHEL', 'Shell', 'NYSE', '2023-01-24 04:48:01.285215', 58.3650, 58.3500, 58.8300, 58.9000, 204680855552.0000, 3212385.0000, 4497627.0000, true, '2022-11-01 12:52:45.944782'),
-       (67, 'CSCO', 'Cisco Systems', 'NYSE', '2023-01-24 04:47:35.481168', 46.8950, 46.8100, 47.8650, 46.7800, 195134750720.0000, 15180548.0000, 18502655.0000, true, '2022-11-01 12:52:45.944782'),
-       (93, 'SAP', 'SAP SE', 'NYSE', '2023-01-24 04:47:58.964997', 115.6400, 115.5950, 117.0200, 117.1200, 136504016896.0000, 1056277.0000, 1058232.0000, true, '2022-11-01 12:52:45.944782');
+values (32, 'JNJ', 'Johnson & Johnson', 'NYSE', '2023-01-24 04:47:49.639672', 169.1000, 167.9470, 169.6300, 168.7400, 440043110400.0000, 8398461.0000, 6461881.0000, 1, '2022-11-01 12:52:45.944782'),
+       (48, 'WMT', 'Walmart', 'NYSE', '2023-01-24 04:48:18.101977', 140.4600, 140.2000, 143.0100, 140.5400, 384671547392.0000, 4377999.0000, 6335368.0000, 1, '2022-11-01 12:52:45.944782'),
+       (19, 'AXP', 'American Express Company', 'NYSE', '2023-01-24 04:47:33.205083', 152.0000, 151.5500, 155.0600, 151.6000, 115073884160.0000, 3281304.0000, 2819185.0000, 1, '2022-11-01 12:52:45.944782'),
+       (70, 'RTX', 'Raytheon Technologies', 'NYSE', '2023-01-24 04:47:56.718921', 94.8000, 94.5100, 96.9300, 94.3600, 141493272576.0000, 5595639.0000, 4559396.0000, 1, '2022-11-01 12:52:45.944782'),
+       (66, 'SNY', 'Sanofi', 'NYSE', '2023-01-24 04:48:03.80486', 48.8300, 48.5600, 48.9500, 49.0800, 122288898048.0000, 2880556.0000, 2583342.0000, 1, '2022-11-01 12:52:45.944782'),
+       (30, 'UNH', 'UnitedHealth Group', 'NYSE', '2023-01-24 04:48:13.486651', 486.6800, 481.3900, 490.1000, 486.7200, 453916065792.0000, 3395268.0000, 3336737.0000, 1, '2022-11-01 12:52:45.944782'),
+       (75, 'XOM', 'Exxon Mobil', 'NYSE', '2023-01-24 04:48:20.530362', 113.6400, 112.6400, 114.5900, 113.3500, 464378363904.0000, 16440556.0000, 17573627.0000, 1, '2022-11-01 12:52:45.944782'),
+       (63, 'SHEL', 'Shell', 'NYSE', '2023-01-24 04:48:01.285215', 58.3650, 58.3500, 58.8300, 58.9000, 204680855552.0000, 3212385.0000, 4497627.0000, 1, '2022-11-01 12:52:45.944782'),
+       (67, 'CSCO', 'Cisco Systems', 'NYSE', '2023-01-24 04:47:35.481168', 46.8950, 46.8100, 47.8650, 46.7800, 195134750720.0000, 15180548.0000, 18502655.0000, 1, '2022-11-01 12:52:45.944782'),
+       (93, 'SAP', 'SAP SE', 'NYSE', '2023-01-24 04:47:58.964997', 115.6400, 115.5950, 117.0200, 117.1200, 136504016896.0000, 1056277.0000, 1058232.0000, 1, '2022-11-01 12:52:45.944782');
 insert into trade_symbol (trade_symbol_id, symbol, company, exchange, price_time, open_price, low_price, high_price, close_price, market_cap, volume, avg_volume, enabled, created_date)
-values (22, 'NVDA', 'NVIDIA', 'NYSE', '2023-01-24 04:47:54.262921', 180.6400, 178.1750, 192.4500, 178.3900, 478289526784.0000, 65516259.0000, 46990262.0000, true, '2022-11-01 12:52:45.944782'),
-       (39, 'V', 'Visa Inc.', 'NYSE', '2023-01-24 04:48:15.720844', 224.6000, 223.1540, 226.2000, 224.3100, 474728038400.0000, 5492244.0000, 7037685.0000, true, '2022-11-01 12:52:45.944782'),
-       (28, 'TSM', 'Taiwan Semiconductor Manufacturing Company', 'NYSE', '2023-01-24 04:48:08.391189', 91.7600, 91.7200, 95.7300, 91.0300, 496092774400.0000, 22763780.0000, 15194103.0000, true, '2022-11-01 12:52:45.944782'),
-       (74, 'AMZN', 'Amazon.com', 'NYSE', '2023-01-24 04:47:28.716995', 97.5600, 95.8700, 97.7450, 97.2500, 994869772288.0000, 76501103.0000, 85649260.0000, true, '2022-11-01 12:52:45.944782'),
-       (95, 'TSLA', 'Tesla', 'NYSE', '2023-01-24 04:48:06.060002', 135.8700, 134.2700, 145.3790, 133.4200, 453926551552.0000, 201802953.0000, 127514222.0000, true, '2022-11-01 12:52:45.944782'),
-       (20, 'ADP', 'Automatic Data Processing', 'NYSE', '2023-01-24 04:47:26.463123', 236.4800, 235.4400, 241.8600, 237.1700, 99956957184.0000, 1654699.0000, 1667572.0000, true, '2022-11-01 12:52:45.944782');
+values (22, 'NVDA', 'NVIDIA', 'NYSE', '2023-01-24 04:47:54.262921', 180.6400, 178.1750, 192.4500, 178.3900, 478289526784.0000, 65516259.0000, 46990262.0000, 1, '2022-11-01 12:52:45.944782'),
+       (39, 'V', 'Visa Inc.', 'NYSE', '2023-01-24 04:48:15.720844', 224.6000, 223.1540, 226.2000, 224.3100, 474728038400.0000, 5492244.0000, 7037685.0000, 1, '2022-11-01 12:52:45.944782'),
+       (28, 'TSM', 'Taiwan Semiconductor Manufacturing Company', 'NYSE', '2023-01-24 04:48:08.391189', 91.7600, 91.7200, 95.7300, 91.0300, 496092774400.0000, 22763780.0000, 15194103.0000, 1, '2022-11-01 12:52:45.944782'),
+       (74, 'AMZN', 'Amazon.com', 'NYSE', '2023-01-24 04:47:28.716995', 97.5600, 95.8700, 97.7450, 97.2500, 994869772288.0000, 76501103.0000, 85649260.0000, 1, '2022-11-01 12:52:45.944782'),
+       (95, 'TSLA', 'Tesla', 'NYSE', '2023-01-24 04:48:06.060002', 135.8700, 134.2700, 145.3790, 133.4200, 453926551552.0000, 201802953.0000, 127514222.0000, 1, '2022-11-01 12:52:45.944782'),
+       (20, 'ADP', 'Automatic Data Processing', 'NYSE', '2023-01-24 04:47:26.463123', 236.4800, 235.4400, 241.8600, 237.1700, 99956957184.0000, 1654699.0000, 1667572.0000, 1, '2022-11-01 12:52:45.944782');
 
 update trade_symbol
 set price_time   = now(),
     created_date = now()
-where enabled = true;
+where enabled = 1;
 
 truncate table trade_symbol_price_historic;
 
@@ -1330,7 +1329,7 @@ VALUES (43, '2023-01-19 00:00:00', 36.3900, 35.8800, 32.7780, 36.3900, '1DAY'),
 
 
 INSERT INTO app_user (email, passkey, enabled, personal_details, user_notifications, preferred_region, SECURITY_PIN, created_date, updated_date)
-VALUES ('sally@tradex.com', '$2a$10$4IVKu1DVnBp9KSptIm8ywe3ewCE2OZD4g040Vth01ddGKRP9V5eM2', true, '{"fullName":"sally rose", "address":"sa jones", "phone":"+10000678", "country":"AUSTRALIA", "gender":"FEMALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED" }', 'sydney', 9999, now(), now()),
-       ('molly@tradex.com', '$2a$10$ZP4jvGcjlgVyl5XcStQox.wO6mR/kDb0L5ubGniOOvLT6OfYebG8G', true, '{"fullName":"molly moe", "address":"dalal street", "phone":"+9178900009", "country":"INDIA", "gender":"FEMALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'mumbai', 8888, now(), now()),
-       ('leo@tradex.com', '$2a$10$kb/IL57Tb8MJsgzTk07egOgs4u/dATz717Ku1rpWFz1EstHfXZZqy', true, '{"fullName":"leo lance", "address":"10 Downing Street", "phone":"+4478900009", "country":"UK", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'london', 8888, now(), now()),
-       ('scrooge@tradex.com', '$2a$10$8Vo.rS0D5zUt8m7QdiTN4.TQ01Rcw2FWQH1eQ1OH/94ivpcfL9Kue', true, '{"fullName":"uncle scrooge", "address":"Vault Street", "phone":"+178900009", "country":"USA", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'washington', 9999, now(), now());
+VALUES ('sally@tradex.com', '$2a$10$4IVKu1DVnBp9KSptIm8ywe3ewCE2OZD4g040Vth01ddGKRP9V5eM2', 1, '{"fullName":"sally rose", "address":"sa jones", "phone":"+10000678", "country":"AUSTRALIA", "gender":"FEMALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED" }', 'sydney', 9999, now(), now()),
+       ('molly@tradex.com', '$2a$10$ZP4jvGcjlgVyl5XcStQox.wO6mR/kDb0L5ubGniOOvLT6OfYebG8G', 1, '{"fullName":"molly moe", "address":"dalal street", "phone":"+9178900009", "country":"INDIA", "gender":"FEMALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'mumbai', 8888, now(), now()),
+       ('leo@tradex.com', '$2a$10$kb/IL57Tb8MJsgzTk07egOgs4u/dATz717Ku1rpWFz1EstHfXZZqy', 1, '{"fullName":"leo lance", "address":"10 Downing Street", "phone":"+4478900009", "country":"UK", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'london', 8888, now(), now()),
+       ('scrooge@tradex.com', '$2a$10$8Vo.rS0D5zUt8m7QdiTN4.TQ01Rcw2FWQH1eQ1OH/94ivpcfL9Kue', 1, '{"fullName":"uncle scrooge", "address":"Vault Street", "phone":"+178900009", "country":"USA", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'washington', 9999, now(), now());
