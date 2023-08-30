@@ -80,7 +80,7 @@ public class StockInfoService {
             loadStockTrendCache();
             log.debug("Trend Map: {}", stockInfoCache.fetchTrendMap());
         }
-        stockRepo.getAllActiveTradeXStocks(TradeXDataSourceType.SINGLE_REGION_MULTI_ZONE).forEach(e -> {
+        stockRepo.getAllActiveTradeXStocks(TradeXDataSourceType.MULTI_REGION_MULTI_ZONE).forEach(e -> {
             StockPerformance entry = new StockPerformance();
             entry.setStock(e);
             entry.setTrend(stockInfoCache.fetchTrend(e.getId()));

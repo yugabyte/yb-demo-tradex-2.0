@@ -37,11 +37,22 @@ public class MultiRegionDbConfig {
         HikariConfig config = hikariConfigProvider.getConfig();
         config.setUsername(username);
         config.setPassword(password);
-        config.setJdbcUrl(loadBalance ? (jdbcUrl + "?load-balance=true&topology-keys=" + topologyKeys) : jdbcUrl);
+        config.setJdbcUrl(jdbcUrl());
         config.setPoolName("mrmz-pool");
 
       return new HikariDataSource(config);
 
+    }
+    private String jdbcUrl(){
+        if(loadBalance){
+            if ( jdbcUrl.contains("?")){
+                return String.format("%1$s&topology-keys=%2$s", jdbcUrl, topologyKeys);
+            }else{
+                return String.format("%1$s?topology-keys=%2$s", jdbcUrl,topologyKeys);
+            }
+        }else{
+            return jdbcUrl;
+        }
     }
 
     @Bean

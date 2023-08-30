@@ -76,7 +76,7 @@ public class StockRepo {
 
     public List<Pair<Integer, List<Double>>> fetchStockTrends() {
         // Using single region, as stock data is common across cluster types.
-        NamedParameterJdbcTemplate template = resolver.resolve(TradeXDataSourceType.SINGLE_REGION_MULTI_ZONE);
+        NamedParameterJdbcTemplate template = resolver.resolve(TradeXDataSourceType.MULTI_REGION_MULTI_ZONE);
 
         try {
             return template.query(provider.getStockSQL(SqlQueries.StockSql.STOCK_TREND),

@@ -38,7 +38,6 @@ app:
     username: ${APP_MULTI_REGION_DB_USER}
     password: ${APP_MULTI_REGION_DB_PWD}
     jdbcUrl: ${APP_MULTI_REGION_DB_URL}
-
     topology-keys: ${APP_MULTI_REGION_DB_TP_KEYS}
 
   mrrr-db:

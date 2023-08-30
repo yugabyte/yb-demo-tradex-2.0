@@ -23,7 +23,7 @@ public class TradeXDbResolvingInterceptor implements HandlerInterceptor {
 
             if (StringUtils.isEmpty(dbTypeSelected)) {
                 log.debug("Missing Request Header, defaulting to single");
-                TradeXDBTypeContext.setDBType(TradeXDataSourceType.SINGLE_REGION_MULTI_ZONE);
+                TradeXDBTypeContext.setDBType(TradeXDataSourceType.MULTI_REGION_MULTI_ZONE);
             } else {
                 log.debug("Using DBType: {}", dbTypeSelected);
                 TradeXDBTypeContext.setDBType(TradeXDataSourceType.valueOf(dbTypeSelected));
