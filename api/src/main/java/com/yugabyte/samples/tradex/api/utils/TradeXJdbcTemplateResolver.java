@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TradeXJdbcTemplateResolver {
 
-    @Autowired
+    @Autowired(required = false)
     @Qualifier("SINGLE_DB_TEMPLATE")
     NamedParameterJdbcTemplate singleDbJdbcTemplate;
 

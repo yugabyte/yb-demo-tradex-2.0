@@ -170,23 +170,8 @@ values ('DB_CLUSTER_TYPES',
           "DB_CLUSTER_TYPES": [
             {
               "id": 0,
-              "title": "Single-region, multi-zone",
-              "subtitle": "3 node deployed in US West"
-            },
-            {
-              "id": 1,
               "title": " Multi-region",
-              "subtitle": "3 nodes deployed in US West, US Central and US East"
-            },
-            {
-              "id": 2,
-              "title": " Multi-region, multi-zone with Read Replicas",
-              "subtitle": "3 nodes deployed in US East, with read replicas in Europe and Asia"
-            },
-            {
-              "id": 3,
-              "title": " Geo-partitioned",
-              "subtitle": "3 nodes deployed in US East, with 2 nodes in Europe and Asia"
+              "subtitle": "3 nodes deployed in US West 1, US West 2 and US East"
             }
           ]
         }');
@@ -197,94 +182,24 @@ values ('DEFAULT_NODE_LOCATIONS',
           "DEFAULT_NODE_LOCATIONS": [
             {
               "id": 0,
-              "name": "useast1",
+              "name": "us-east-1",
               "country": "USA",
               "latitude": "38.13",
               "longitude": "-78.45"
             },
             {
               "id": 1,
-              "name": "useast2",
-              "country": "USA",
-              "latitude": "39.96",
-              "longitude": "-83"
-            },
-            {
-              "id": 2,
-              "name": "uswest1",
+              "name": "us-west-1",
               "country": "USA",
               "latitude": "37.35",
               "longitude": "-121.96"
             },
             {
-              "id": 3,
-              "name": "uswest2",
+              "id": 2,
+              "name": "us-west-2",
               "country": "USA",
               "latitude": "46.15",
               "longitude": "-123.88"
-            },
-            {
-              "id": 4,
-              "name": "euwest1",
-              "country": "Ireland",
-              "latitude": "53",
-              "longitude": "-8"
-            },
-            {
-              "id": 5,
-              "name": "euwest2",
-              "country": "UK",
-              "latitude": "51",
-              "longitude": "-0.1"
-            },
-            {
-              "id": 6,
-              "name": "euwest3",
-              "country": "FRANCE",
-              "latitude": "48.86",
-              "longitude": "2.35"
-            },
-            {
-              "id": 7,
-              "name": "eucentral1",
-              "country": "GERMANY",
-              "latitude": "50",
-              "longitude": "8"
-            },
-            {
-              "id": 8,
-              "name": "apsoutheast1",
-              "country": "SINGAPORE",
-              "latitude": "1.32",
-              "longitude": "103.69"
-            },
-            {
-              "id": 9,
-              "name": "apsoutheast2",
-              "country": "AUSTRALIA",
-              "latitude": "-33.91",
-              "longitude": "151.19"
-            },
-            {
-              "id": 10,
-              "name": "apsouth1",
-              "country": "INDIA",
-              "latitude": "19.242",
-              "longitude": "72.96"
-            },
-            {
-              "id": 11,
-              "name": "apnortheast1",
-              "country": "JAPAN",
-              "latitude": "35.617",
-              "longitude": "139.74"
-            },
-            {
-              "id": 12,
-              "name": "datacenter1",
-              "country": "USA",
-              "latitude": "38.13",
-              "longitude": "-78.45"
             }
           ]
         }');
@@ -407,8 +322,9 @@ VALUES ('ASML', 'ASML Holding', 'NYSE', 1, '2022-11-01 12:52:45.944782'),
        ('BAC', 'Bank of America', 'NYSE', 0, '2022-11-01 12:52:45.944782');
 
 INSERT INTO app_user (email, passkey, enabled, personal_details, user_notifications, preferred_region, SECURITY_PIN, created_date, updated_date)
-VALUES ('mickey@tradex.com', '$2a$10$.F2QPGfG8YzHRqQ1o5uuLeHiWPxLwinmFz67TIEg.4VS8PHITiHxy', 1, '{"fullName":"mickey mouse", "address":"wallstreet", "phone":"+10000007", "country":"USA", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED" }', 'boston', 9999, '2022-10-26 11:30:47.624492', '2022-10-26 11:30:47.624492'),
-       ('donald@tradex.com', '$2a$10$wK4JTnG6H02BkTBpyqbfi.O1YyMC.81FM1biSEtrvqRbA005/mR.m', 1, '{"fullName":"donald duck", "address":"wallstreet", "phone":"+10000009", "country":"USA", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'sydney', 8888, '2022-10-26 11:31:41.758602', '2022-10-26 11:31:41.758602');
+VALUES ('mickey@tradex.com', '$2a$10$.F2QPGfG8YzHRqQ1o5uuLeHiWPxLwinmFz67TIEg.4VS8PHITiHxy', 1, '{"fullName":"mickey mouse", "address":"wallstreet", "phone":"+10000007", "country":"USA", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED" }', 'us-east-1', 9999, '2022-10-26 11:30:47.624492', '2022-10-26 11:30:47.624492'),
+       ('donald@tradex.com', '$2a$10$wK4JTnG6H02BkTBpyqbfi.O1YyMC.81FM1biSEtrvqRbA005/mR.m', 1, '{"fullName":"donald duck", "address":"wallstreet", "phone":"+10000009", "country":"USA", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'us-west-1', 9999, '2022-10-26 11:31:41.758602', '2022-10-26 11:31:41.758602'),
+       ('don@tradex.com', '$2a$10$wK4JTnG6H02BkTBpyqbfi.O1YyMC.81FM1biSEtrvqRbA005/mR.m', 1, '{"fullName":"don vito", "address":"wallstreet", "phone":"+10000009", "country":"USA", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'us-west-2', 9999, '2022-10-26 11:31:41.758602', '2022-10-26 11:31:41.758602');
 
 delete
 from trade_symbol
@@ -1329,7 +1245,7 @@ VALUES (43, '2023-01-19 00:00:00', 36.3900, 35.8800, 32.7780, 36.3900, '1DAY'),
 
 
 INSERT INTO app_user (email, passkey, enabled, personal_details, user_notifications, preferred_region, SECURITY_PIN, created_date, updated_date)
-VALUES ('sally@tradex.com', '$2a$10$4IVKu1DVnBp9KSptIm8ywe3ewCE2OZD4g040Vth01ddGKRP9V5eM2', 1, '{"fullName":"sally rose", "address":"sa jones", "phone":"+10000678", "country":"AUSTRALIA", "gender":"FEMALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED" }', 'sydney', 9999, now(), now()),
-       ('molly@tradex.com', '$2a$10$ZP4jvGcjlgVyl5XcStQox.wO6mR/kDb0L5ubGniOOvLT6OfYebG8G', 1, '{"fullName":"molly moe", "address":"dalal street", "phone":"+9178900009", "country":"INDIA", "gender":"FEMALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'mumbai', 8888, now(), now()),
-       ('leo@tradex.com', '$2a$10$kb/IL57Tb8MJsgzTk07egOgs4u/dATz717Ku1rpWFz1EstHfXZZqy', 1, '{"fullName":"leo lance", "address":"10 Downing Street", "phone":"+4478900009", "country":"UK", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'london', 8888, now(), now()),
-       ('scrooge@tradex.com', '$2a$10$8Vo.rS0D5zUt8m7QdiTN4.TQ01Rcw2FWQH1eQ1OH/94ivpcfL9Kue', 1, '{"fullName":"uncle scrooge", "address":"Vault Street", "phone":"+178900009", "country":"USA", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'washington', 9999, now(), now());
+VALUES ('sally@tradex.com', '$2a$10$4IVKu1DVnBp9KSptIm8ywe3ewCE2OZD4g040Vth01ddGKRP9V5eM2', 1, '{"fullName":"sally rose", "address":"sa jones", "phone":"+10000678", "country":"AUSTRALIA", "gender":"FEMALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED" }', 'us-west-1', 9999, now(), now()),
+       ('molly@tradex.com', '$2a$10$ZP4jvGcjlgVyl5XcStQox.wO6mR/kDb0L5ubGniOOvLT6OfYebG8G', 1, '{"fullName":"molly moe", "address":"dalal street", "phone":"+9178900009", "country":"INDIA", "gender":"FEMALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'us-east-1', 8888, now(), now()),
+       ('leo@tradex.com', '$2a$10$kb/IL57Tb8MJsgzTk07egOgs4u/dATz717Ku1rpWFz1EstHfXZZqy', 1, '{"fullName":"leo lance", "address":"10 Downing Street", "phone":"+4478900009", "country":"UK", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'us-west-2', 8888, now(), now()),
+       ('scrooge@tradex.com', '$2a$10$8Vo.rS0D5zUt8m7QdiTN4.TQ01Rcw2FWQH1eQ1OH/94ivpcfL9Kue', 1, '{"fullName":"uncle scrooge", "address":"Vault Street", "phone":"+178900009", "country":"USA", "gender":"MALE"}', '{"generalNotification":"ENABLED", "sound":"DISABLED", "vibrate":"ENABLED", "appUpdates":"DISABLED", "billReminder":"DISABLED", "promotion":"DISABLED", "discountAvailable":"DISABLED", "paymentReminder":"DISABLED", "newServiceAvailable":"DISABLED", "newTipsAvailable":"DISABLED"}', 'us-west-2', 9999, now(), now());

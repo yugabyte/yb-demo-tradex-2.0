@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 @Component
 public class TradeXDataSourceResolver {
 
-    @Autowired
+    @Autowired(required = false)
     @Qualifier("SINGLE_DB")
     DataSource singleDbDataSource;
 
