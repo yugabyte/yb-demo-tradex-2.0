@@ -11,7 +11,7 @@ public class TradeXDBTypeContext {
     }
 
     public static TradeXDataSourceType getDbType() {
-        return null == CONTEXT.get() ? TradeXDataSourceType.SINGLE_REGION_MULTI_ZONE : CONTEXT.get();
+        return null == CONTEXT.get() ? TradeXDataSourceType.MULTI_REGION_MULTI_ZONE : CONTEXT.get();
     }
 
     public static void clear() {

@@ -47,7 +47,7 @@ public class StartupTask implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         Instant start = Instant.now();
-        NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(TradeXDataSourceType.SINGLE_REGION_MULTI_ZONE);
+        NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(TradeXDataSourceType.MULTI_REGION_MULTI_ZONE);
         log.info("Application started. Number of REF_DATA entries: "
                 + template.queryForObject(CHECK_SQL, new HashMap<>(0), Integer.class));
         try {

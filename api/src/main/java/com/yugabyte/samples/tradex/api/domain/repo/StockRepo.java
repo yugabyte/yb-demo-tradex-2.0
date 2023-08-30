@@ -152,6 +152,6 @@ class TrendCacheRowMapper implements RowMapper<Pair<Integer, List<Double>>> {
       .map(Double::valueOf)
       .collect(Collectors.toList());
 
-    return Pair.of(stockId, trend);
-  }
+        return Pair.of(stockId, trend);
+    }
 }

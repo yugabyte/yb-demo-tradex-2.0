@@ -78,7 +78,7 @@ public class ReferenceDataController {
         log.debug("AppServer: {}, User Location: {}, DB Cluster Type:{}", instanceLocation,
                 request.getHeader("x-user-location"), request.getHeader("x-tradex-db-type"));
 
-        if (TradeXDataSourceType.SINGLE_REGION_MULTI_ZONE.equals(TradeXDBTypeContext.getDbType())) {
+        if (TradeXDataSourceType.MULTI_REGION_MULTI_ZONE.equals(TradeXDBTypeContext.getDbType())) {
             log.debug("Fetching first node from single");
             return getDbNodes().get(0);
         }

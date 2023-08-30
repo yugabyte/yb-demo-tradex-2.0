@@ -53,7 +53,7 @@ export default async function getJSON(baseURL, options) {
     }
   }
 
-  const dbSelection = localStorage.hasOwnProperty("currentDbSelection") ? localStorage.getItem("currentDbSelection") : 0;
+  const dbSelection = localStorage.hasOwnProperty("currentDbSelection") ? localStorage.getItem("currentDbSelection") : 1;
   const getHeaders = buildHeaders(dbSelection, myLocation); //new Headers();
   
 
@@ -86,7 +86,7 @@ export async function postJSON(baseURL = "", data = {}, options) {
         }
       }
 
-    const dbSelection = localStorage.hasOwnProperty("currentDbSelection") ? localStorage.getItem("currentDbSelection") : 0;
+    const dbSelection = localStorage.hasOwnProperty("currentDbSelection") ? localStorage.getItem("currentDbSelection") : 1;
     const postHeaders = buildHeaders(dbSelection, myLocation);   
 
 
@@ -129,7 +129,7 @@ export async function putJSON(baseURL = "", data = {}, options) {
         }
       }
 
-    const dbSelection = localStorage.hasOwnProperty("currentDbSelection") ? localStorage.getItem("currentDbSelection") : 0;
+    const dbSelection = localStorage.hasOwnProperty("currentDbSelection") ? localStorage.getItem("currentDbSelection") : 1;
     const putHeaders = buildHeaders(dbSelection, myLocation);     
 
 
