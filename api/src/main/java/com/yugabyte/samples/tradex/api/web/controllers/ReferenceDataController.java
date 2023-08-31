@@ -86,6 +86,34 @@ public class ReferenceDataController {
         return getCloseNode(TradeXDBTypeContext.getDbType(), request.getHeader("x-user-location"));
     }
 
+    /*public static double distance(double x1, double y1, double x2, double y2) {
+        double x = Math.pow(x2 - x1, 2);
+        double y = Math.pow(y2 - y1, 2);
+        return Math.sqrt( x + y );
+    }
+
+    public static int nearestPoint(double[] coordinate, double[][] points) {
+        final int X = 0;
+        final int Y = 1;
+        int indexFound = 0;
+        double[] closestPoint = points[0];
+        double closestDist = distance(coordinate[X], coordinate[Y],
+                closestPoint[X], closestPoint[Y]);
+
+        // Traverse the array
+        for(int i = 0; i < points.length; i++) {
+            double dist = distance(coordinate[X], coordinate[Y],
+                    points[i][X], points[i][Y]);
+            if (dist < closestDist && dist != 0.0) {
+                closestDist = dist;
+                closestPoint = points[i];
+                indexFound = i;
+            }
+        }
+
+        return indexFound;
+    }*/
+
     @GetMapping("/api/refdata/dbhealth/regions")
     public Collection<YBRegion> getAllRegions() {
         return nodeHealthStatusCache.getAllRegions();
