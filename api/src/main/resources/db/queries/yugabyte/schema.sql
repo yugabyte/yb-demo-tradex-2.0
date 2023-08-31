@@ -169,9 +169,9 @@ values ('DB_CLUSTER_TYPES',
         '{
           "DB_CLUSTER_TYPES": [
             {
-              "id": 0,
+              "id": 1,
               "title": " Multi-region",
-              "subtitle": "3 nodes deployed in US West 1, US West 2 and US East"
+              "subtitle": "5 nodes deployed in US West 1, US West 2, US East 1 and US East 2"
             }
           ]
         }');
@@ -189,13 +189,20 @@ values ('DEFAULT_NODE_LOCATIONS',
             },
             {
               "id": 1,
+              "name": "us-east-2",
+              "country": "USA",
+              "latitude": "39.96",
+              "longitude": "-83"
+            },
+            {
+              "id": 2,
               "name": "us-west-1",
               "country": "USA",
               "latitude": "37.35",
               "longitude": "-121.96"
             },
             {
-              "id": 2,
+              "id": 3,
               "name": "us-west-2",
               "country": "USA",
               "latitude": "46.15",

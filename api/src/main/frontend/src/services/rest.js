@@ -20,7 +20,7 @@ function buildHeaders(myDBSelection, myLocation) {
           reqHeaders.append('X-TRADEX-DB-TYPE', 'GEO_PARTITIONED');
           break;
         default:
-          reqHeaders.append('X-TRADEX-DB-TYPE', 'SINGLE_REGION_MULTI_ZONE');
+          reqHeaders.append('X-TRADEX-DB-TYPE', 'MULTI_REGION_MULTI_ZONE');
           break;
   }
 
