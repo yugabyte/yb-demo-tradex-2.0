@@ -97,7 +97,7 @@ public class RefDataService {
 
         return refdataRepo.fetchDBNodes(dataSourceType).stream().map(e -> {
 
-            String regionLookupKey = StringUtils.replace(e.getRegion(), "-", "");
+            String regionLookupKey = StringUtils.replace(e.getRegion(), "-", "-");
             Location loc = StringUtils.isEmpty(e.getRegion()) ? null : nodeLocations.get(regionLookupKey);
 
             if (defaultNodeLocations.containsKey(regionLookupKey)) {
