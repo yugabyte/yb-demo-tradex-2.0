@@ -1,5 +1,7 @@
 package com.yugabyte.samples.tradex.api.config;
 
+import static java.lang.String.format;
+
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +47,10 @@ public class MultiRegionDbConfig {
     }
     private String jdbcUrl(){
         if(loadBalance){
-            if ( jdbcUrl.contains("?")){
-                return String.format("%1$s&topology-keys=%2$s", jdbcUrl, topologyKeys);
-            }else{
-                return String.format("%1$s?topology-keys=%2$s", jdbcUrl,topologyKeys);
-            }
+            return format("%1$s%2$sload_balance=true&yb_servers_refresh_interval=5&topology_keys=%3$s",
+              jdbcUrl,
+              jdbcUrl.contains("?")?"&":"?",
+              topologyKeys);
         }else{
             return jdbcUrl;
         }
