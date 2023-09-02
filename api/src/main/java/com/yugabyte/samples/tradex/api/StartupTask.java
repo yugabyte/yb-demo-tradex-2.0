@@ -55,8 +55,6 @@ public class StartupTask implements CommandLineRunner {
             if (loadRequired) {
                 log.info("Loading metadata - begin");
                 stockInfoService.loadStockPerformance(false);
-                List<TradeOrder> user1Trades = generator.generateTrades(354, 1, "boston", sampleStockList);
-                List<TradeOrder> user2Trades = generator.generateTrades(354, 2, "boston", sampleStockList);
                 for (TradeXDataSourceType t : tradeXInputDataSourceTypes) {
                     dataService.getDBNodes(t);
                     dataService.getDbClusterTypes(t);
@@ -64,11 +62,21 @@ public class StartupTask implements CommandLineRunner {
 
                     // generate few trade orders
                     if ("BOSTON".equalsIgnoreCase(location)) {
+                        List<TradeOrder> user1Trades = generator.generateTrades(354, 1, "us-east-1", sampleStockList);
+                        List<TradeOrder> user2Trades = generator.generateTrades(354, 2, "us-east-1", sampleStockList);
                         tradeService.deleteAllUserTrades(t, 1);
                         tradeService.deleteAllUserTrades(t, 2);
-                        tradeService.insertTrades(t, user1Trades, 1, "boston");
-                        tradeService.insertTrades(t, user2Trades, 2, "boston");
+                        tradeService.insertTrades(t, user1Trades, 1, "us-east-1");
+                        tradeService.insertTrades(t, user2Trades, 2, "us-east-1");
                     }
+                  if ("WASHINGTON".equalsIgnoreCase(location)) {
+                    List<TradeOrder> user1Trades = generator.generateTrades(354, 1, "us-west-2", sampleStockList);
+                    List<TradeOrder> user2Trades = generator.generateTrades(354, 2, "us-west-2", sampleStockList);
+                    tradeService.deleteAllUserTrades(t, 1);
+                    tradeService.deleteAllUserTrades(t, 2);
+                    tradeService.insertTrades(t, user1Trades, 1, "us-west-2");
+                    tradeService.insertTrades(t, user2Trades, 2, "us-west-2");
+                  }
                 }
                 dataService.getNodeLocations();
 
