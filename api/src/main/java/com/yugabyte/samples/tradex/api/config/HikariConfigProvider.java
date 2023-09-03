@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Properties;
 
-@Component
+//@Component
 public class HikariConfigProvider {
 
     @Value("${TRADEX_DB_POOL_MIN:3}")

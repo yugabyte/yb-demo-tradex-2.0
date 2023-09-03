@@ -8,8 +8,8 @@ app:
       schedule: 0,15,30,45 * * * * *
   load_mock_data: ${APP_LOAD_MOCK_DATA:true}
   load_balance: ${APP_DB_LOADBALANCE:true}
-  mylocation: ${APP_INSTANCE_LOCATION}
-  datasource_types: ${DATASOURCE_TYPES}
+  mylocation: ${APP_INSTANCE_LOCATION:WASHINGTON}
+  datasource_types: ${DATASOURCE_TYPES:MULTI_REGION_MULTI_ZONE}
   security:
     jwt:
       secret: cccccclvkgnllrhrngucjbivrehvjcnkfvfihildhfcg
@@ -22,41 +22,42 @@ app:
       custid: ${YB_API_CUST}
       authtoken: ${YB_API_TOKEN}
 
-  srmz-db:
-    username: ${APP_SINGLE_DB_USER}
-    password: ${APP_SINGLE_DB_PWD}
-    jdbcUrl: ${APP_SINGLE_DB_URL}
-
-    topology-keys: ${APP_SINGLE_DB_TP_KEYS}
-
-  orcl-srmz-db:
-    username: ${APP_SINGLE_ORCL_DB_USER}
-    password: ${APP_SINGLE_ORCL_DB_PWD}
-    jdbcUrl: ${APP_SINGLE_ORCL_DB_URL}
-
-  mrmz-db:
-    username: ${APP_MULTI_REGION_DB_USER}
-    password: ${APP_MULTI_REGION_DB_PWD}
-    jdbcUrl: ${APP_MULTI_REGION_DB_URL}
-    topology-keys: ${APP_MULTI_REGION_DB_TP_KEYS}
-
-  mrrr-db:
-    username: ${APP_MULTI_REGION_READ_REPLICA_DB_USER}
-    password: ${APP_MULTI_REGION_READ_REPLICA_DB_PWD}
-    jdbcUrl: ${APP_MULTI_REGION_READ_REPLICA_DB_URL}
-
-    topology-keys: ${APP_MULTI_REGION_READ_REPLICA_DB_TP_KEYS}
-
-  geo-db:
-    username: ${APP_GEO_PART_DB_USER}
-    password: ${APP_GEO_PART_DB_PWD}
-    jdbcUrl: ${APP_GEO_PART_DB_URL}
-    topology-keys: ${APP_GEO_PART_DB_TP_KEYS}
+#  srmz-db:
+#    username: ${APP_SINGLE_DB_USER}
+#    password: ${APP_SINGLE_DB_PWD}
+#    jdbcUrl: ${APP_SINGLE_DB_URL}
+#
+#    topology-keys: ${APP_SINGLE_DB_TP_KEYS}
+#
+#  orcl-srmz-db:
+#    username: ${APP_SINGLE_ORCL_DB_USER}
+#    password: ${APP_SINGLE_ORCL_DB_PWD}
+#    jdbcUrl: ${APP_SINGLE_ORCL_DB_URL}
+#
+#  mrmz-db:
+#    username: ${APP_MULTI_REGION_DB_USER}
+#    password: ${APP_MULTI_REGION_DB_PWD}
+#    jdbcUrl: ${APP_MULTI_REGION_DB_URL}
+#    topology-keys: ${APP_MULTI_REGION_DB_TP_KEYS}
+#
+#  mrrr-db:
+#    username: ${APP_MULTI_REGION_READ_REPLICA_DB_USER}
+#    password: ${APP_MULTI_REGION_READ_REPLICA_DB_PWD}
+#    jdbcUrl: ${APP_MULTI_REGION_READ_REPLICA_DB_URL}
+#
+#    topology-keys: ${APP_MULTI_REGION_READ_REPLICA_DB_TP_KEYS}
+#
+#  geo-db:
+#    username: ${APP_GEO_PART_DB_USER}
+#    password: ${APP_GEO_PART_DB_PWD}
+#    jdbcUrl: ${APP_GEO_PART_DB_URL}
+#    topology-keys: ${APP_GEO_PART_DB_TP_KEYS}
 
 
 spring:
   application:
     name: trading-api
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -110,6 +111,10 @@ logging:
           client: info
         sql: DEBUG
         cache: WARN
+        beans:
+          factory:
+            config:
+              PropertiesFactoryBean: DEBUG
     com:
       zaxxer:
         hikari: WARN
@@ -117,3 +122,131 @@ logging:
         ysql: WARN
         samples:
           tradex: DEBUG
+---
+spring:
+  config:
+    activate:
+      on-profile: SR & yugabyte
+  datasource:
+    sr:
+      url: jdbc:yugabytedb://127.0.0.1:5433/tradex_sr
+      driver-class-name: com.yugabyte.Driver
+      username: yugabyte
+      password: yugabyte
+      hikari:
+        maximumPoolSize: 50
+        maxLifeTime: 3600000
+        data-source-class-name: com.yugabyte.ysql.YBClusterAwareDataSource
+        data-source-properties:
+          additionalEndpoints: 127.0.0.2:5433,127.0.0.3:5433
+          topologyKeys: "cloud1.datacenter1.rack1"
+
+app:
+  datasource_types: SINGLE_REGION_MULTI_ZONE
+
+---
+spring:
+  config:
+    activate:
+      on-profile: MR & yugabyte
+  datasource:
+    mr:
+      url: jdbc:yugabytedb://127.0.0.1:5433/tradex_mr
+      driver-class-name: com.yugabyte.Driver
+      username: yugabyte
+      password: yugabyte
+      hikari:
+        maximumPoolSize: 50
+        maxLifeTime: 3600000
+        data-source-class-name: com.yugabyte.ysql.YBClusterAwareDataSource
+        data-source-properties:
+          additionalEndpoints: 127.0.0.2:5433,127.0.0.3:5433,127.0.0.4:5433
+          topologyKeys: "aws.us-east-1.*,aws.us-east-2.*"
+app:
+  datasource_types: MULTI_REGION_MULTI_ZONE
+  mylocation: BOSTON
+---
+spring:
+  config:
+    activate:
+      on-profile: MR & yugabyte & west
+  datasource:
+    mr:
+      hikari:
+        data-source-properties:
+          topologyKeys: "aws.us-west-1.*,aws.us-west-2.*"
+app:
+  mylocation: WASHINGTON
+---
+spring:
+  config:
+    activate:
+      on-profile: MR & yugabyte & west & dev
+server:
+  port: 8081
+---
+spring:
+  config:
+    activate:
+      on-profile: GEO & yugabyte
+  datasource:
+    mr:
+      url: jdbc:yugabytedb://127.0.0.1:5433/tradex_geo
+      driver-class-name: com.yugabyte.Driver
+      username: yugabyte
+      password: yugabyte
+      hikari:
+        maximumPoolSize: 50
+        maxLifeTime: 3600000
+        data-source-class-name: com.yugabyte.ysql.YBClusterAwareDataSource
+        data-source-properties:
+          additionalEndpoints: 127.0.0.2:5433,127.0.0.3:5433,127.0.0.4:5433
+          topologyKeys: "aws.us-east-1.*,aws.us-east-2.*"
+app:
+  datasource_types: GEO_PARTITIONED
+  mylocation: BOSTON
+---
+spring:
+  config:
+    activate:
+      on-profile: GEO & yugabyte & west
+  datasource:
+    mr:
+      hikari:
+        data-source-properties:
+          topologyKeys: "aws.us-west-1.*,aws.us-west-2.*"
+  app:
+    mylocation: WASHINGTON
+---
+spring:
+  config:
+    activate:
+      on-profile: GEO & yugabyte & west & dev
+server:
+  port: 8081
+---
+spring:
+  config:
+    activate:
+      on-profile: MRRR & yugabyte
+  datasource:
+    mrrr:
+      url: jdbc:yugabytedb://127.0.0.1:5433/tradex_mrrr
+      driver-class-name: com.yugabyte.Driver
+      username: yugabyte
+      password: yugabyte
+      hikari:
+        maximumPoolSize: 50
+        maxLifeTime: 3600000
+        data-source-class-name: com.yugabyte.ysql.YBClusterAwareDataSource
+        data-source-properties:
+          serverName: 127.0.0.1
+          portNumber: 5433
+          databaseName: mercury
+          additionalEndpoints: 127.0.0.2:5433,127.0.0.3:5433
+          topologyKeys: "aws.*"
+---
+spring:
+  config:
+    activate:
+      on-profile: SR & oracle

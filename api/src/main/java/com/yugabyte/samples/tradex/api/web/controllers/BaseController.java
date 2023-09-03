@@ -16,14 +16,16 @@ public class BaseController {
     @Autowired
     ConnectionInfoRepo connectionInfoRepo;
 
+    @Autowired
+    TradeXDBTypeContext tradeXDBTypeContext;
     public AppUser fetchUser(Authentication authentication) {
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return userService.findByEmail(dbType, userDetails.getUsername())
                 .orElseThrow( () -> new RuntimeException("User not found"));
     }
 
     public ConnectionInfo fetchConnectionInfo(String region) {
-        return connectionInfoRepo.fetchConnectionDetails(TradeXDBTypeContext.getDbType(), region);
+        return connectionInfoRepo.fetchConnectionDetails(tradeXDBTypeContext.getDbType(), region);
     }
 }

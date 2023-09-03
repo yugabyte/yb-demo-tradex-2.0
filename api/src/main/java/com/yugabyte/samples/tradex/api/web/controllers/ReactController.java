@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @Slf4j
 public class ReactController {
-    @RequestMapping("/")
+    @RequestMapping({"/","/*"})
     public String home() {
         return "index";
     }

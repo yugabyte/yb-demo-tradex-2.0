@@ -44,6 +44,9 @@ public class UserProfileController extends BaseController {
     @Autowired
     QueryStatsProvider enhancer;
 
+    @Autowired
+    TradeXDBTypeContext tradeXDBTypeContext;
+
     ObjectMapper mapper = new ObjectMapper();
 
 
@@ -53,7 +56,7 @@ public class UserProfileController extends BaseController {
                                      @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                              required = false, defaultValue = "false") Boolean inspectQueries) throws ApplicationServiceException {
         Instant start = Instant.now();
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
 
         AppUser user = fetchUser(authentication);
         ConnectionInfo connectionInfo = fetchConnectionInfo(user.getId().getPreferredRegion());
@@ -75,7 +78,7 @@ public class UserProfileController extends BaseController {
 
         AppUser user = fetchUser(authentication);
         try {
-            return portfolioService.getPortfolio(TradeXDBTypeContext.getDbType(), user.getEmail());
+            return portfolioService.getPortfolio(tradeXDBTypeContext.getDbType(), user.getEmail());
         } catch (Exception e) {
             log.error("Error in processing portfolio requests. Message: {}", e.getMessage());
             log.trace("Error in processing portfolio requests.", e );
@@ -89,7 +92,7 @@ public class UserProfileController extends BaseController {
                                        Authentication authentication,
                                        @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                required = false, defaultValue = "false") Boolean inspectQueries) {
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
 
         AppUser appUserFromDB = fetchUser(authentication);
         ConnectionInfo connectionInfo = fetchConnectionInfo(appUserFromDB.getId().getPreferredRegion());
@@ -114,7 +117,7 @@ public class UserProfileController extends BaseController {
     public DBOperationResult createNewUser(@RequestBody AppUser appUser, Authentication authentication,
                                            @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                    required = false, defaultValue = "false") Boolean inspectQueries) {
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
 
         AppUser appUserFromDB = fetchUser(authentication);
         ConnectionInfo connectionInfo = fetchConnectionInfo(appUserFromDB.getId().getPreferredRegion());
@@ -135,7 +138,7 @@ public class UserProfileController extends BaseController {
     public DBOperationResult updateUser(@RequestBody AppUser appUser, Authentication authentication,
                                         @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                 required = false, defaultValue = "false") Boolean inspectQueries) {
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
 
         AppUser appUserFromDB = fetchUser(authentication);
         ConnectionInfo connectionInfo = fetchConnectionInfo(appUserFromDB.getId().getPreferredRegion());
@@ -160,7 +163,7 @@ public class UserProfileController extends BaseController {
                                            @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                    required = false, defaultValue = "false") Boolean inspectQueries) {
 
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
 
         AppUser appUser = fetchUser(authentication);
         ConnectionInfo connectionInfo = fetchConnectionInfo(appUser.getId().getPreferredRegion());
@@ -202,7 +205,7 @@ public class UserProfileController extends BaseController {
                                                      Authentication authentication,
                                                      @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                              required = false, defaultValue = "false") Boolean inspectQueries) {
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
 
         AppUser appUser = fetchUser(authentication);
         ConnectionInfo connectionInfo = fetchConnectionInfo(appUser.getId().getPreferredRegion());
@@ -231,7 +234,7 @@ public class UserProfileController extends BaseController {
                                                 Authentication authentication,
                                                 @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                         required = false, defaultValue = "false") Boolean inspectQueries) {
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
 
         AppUser appUser = fetchUser(authentication);
         ConnectionInfo connectionInfo = fetchConnectionInfo(appUser.getId().getPreferredRegion());

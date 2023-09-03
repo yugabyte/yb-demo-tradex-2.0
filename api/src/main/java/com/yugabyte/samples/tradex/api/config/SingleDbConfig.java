@@ -12,8 +12,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
 
-@Configuration
-@Profile("SINGLE & yugabyte")
+//@Configuration
+//@Profile("SINGLE & yugabyte")
 public class SingleDbConfig {
 
     @Autowired

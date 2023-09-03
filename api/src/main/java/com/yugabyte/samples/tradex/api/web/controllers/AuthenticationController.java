@@ -40,6 +40,9 @@ public class AuthenticationController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private TradeXDBTypeContext tradeXDBTypeContext;
+
     @PostMapping("/sign-up")
     @ResponseStatus(HttpStatus.CREATED)
     public SignUpResponse signup(@Valid @RequestBody SignUpRequest form) {
@@ -56,7 +59,7 @@ public class AuthenticationController {
     @PostMapping("/password-reset")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public PasswordResetResponse passwordReset(@Valid @RequestBody PasswordResetRequest request) {
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
         String login = request.login();
         String newPassword = login + "123";
         final AppUser appUser = userService.findByEmail(dbType, login)
@@ -73,7 +76,7 @@ public class AuthenticationController {
     public AuthenticationResponse authenticate(@Valid @RequestBody AuthenticationRequest request) {
 
         String jwt = authHelper.processLoginAndGenerateJwt(request.getLogin(), request.getCredentials());
-        Optional<AppUser> appUser = userService.findByEmail(TradeXDBTypeContext.getDbType(), request.getLogin());
+        Optional<AppUser> appUser = userService.findByEmail(tradeXDBTypeContext.getDbType(), request.getLogin());
 
         if (appUser.isEmpty()) {
             log.error("No user with username: {}", request.getLogin());
@@ -101,7 +104,7 @@ public class AuthenticationController {
 
     private AppUser createAppUser(SignUpRequest form) {
 
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
 
         if (userService.existsByEmail(dbType, form.getEmail())) {
             throw new ApiException("Failed to complete signup", "email", form.getEmail(), "Email already in use");

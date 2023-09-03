@@ -7,6 +7,12 @@ variable "tls-email" {
   type        = string
   description = "Email address for TLS key"
 }
+
+variable "oracle-db-endpoint" {
+  type        = string
+  description = "Oracle DB endpoint Format: host:port/sid"
+}
+
 variable "vpc-mapping" {
   type = map(object({
     vpc = string

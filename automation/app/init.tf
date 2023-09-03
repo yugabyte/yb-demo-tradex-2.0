@@ -52,4 +52,5 @@ data "aws_vpc" "Sydney" {
 
 locals {
   ssh-host-alias-file-location = pathexpand("~/.ssh/configs")
+  oracle-db-endpoint = var.oracle-db-endpoint
 }

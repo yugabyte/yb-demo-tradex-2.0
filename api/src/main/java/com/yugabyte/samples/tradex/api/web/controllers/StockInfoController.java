@@ -44,6 +44,9 @@ public class StockInfoController extends BaseController {
   @Autowired
   QueryStatsProvider enhancer;
 
+    @Autowired
+    TradeXDBTypeContext tradeXDBTypeContext;
+
   @GetMapping("/api/stocks/{symbol}")
   @Operation(summary = "Fetch Stock Info from yahoo")
   @SecurityRequirement(name = "auth-header-bearer")
@@ -57,7 +60,7 @@ public class StockInfoController extends BaseController {
     TradeXStock data;
     Instant start = Instant.now();
 
-    TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
     AppUser user = fetchUser(authentication);
     ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType, user.getId()
       .getPreferredRegion());
@@ -89,7 +92,7 @@ public class StockInfoController extends BaseController {
 
     try {
 
-      TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+            TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
       AppUser user = fetchUser(authentication);
       ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType, user.getId()
         .getPreferredRegion());
@@ -116,7 +119,7 @@ public class StockInfoController extends BaseController {
   public DBOperationResult fetchFavStocks(Authentication authentication,
     @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER, required = false, defaultValue = "false") Boolean inspectQueries) {
     try {
-      TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+            TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
 
       AppUser appUser = fetchUser(authentication);
       ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType,

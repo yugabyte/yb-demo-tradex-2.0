@@ -1,6 +1,5 @@
 package com.yugabyte.samples.tradex.api.web.controllers;
 
-import com.yugabyte.samples.tradex.api.config.TradeXDataSourceType;
 import com.yugabyte.samples.tradex.api.domain.db.AppUser;
 import com.yugabyte.samples.tradex.api.service.ChartDataService;
 import com.yugabyte.samples.tradex.api.service.DBOperationResult;
@@ -11,7 +10,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -20,20 +18,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @CrossOrigin
-public class ChartDataController extends BaseController{
-    @Autowired
-    ChartDataService chartDataService;
-    @Autowired
-    UserService userService;
+public class ChartDataController extends BaseController {
 
-    @GetMapping("/api/charts/portfolio-chart")
-    @SecurityRequirement(name = "auth-header-bearer")
-    public DBOperationResult getPortfolioChart(Authentication authentication,
-                                               @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
-                                                       required = false, defaultValue = "false") Boolean inspectQueries) {
+  @Autowired
+  ChartDataService chartDataService;
+  @Autowired
+  UserService userService;
 
-        AppUser appUser = fetchUser(authentication);
-        return chartDataService.fetchPortfolioChart(TradeXDBTypeContext.getDbType(), appUser.getId(), inspectQueries);
-    }
+  @Autowired
+  TradeXDBTypeContext tradeXDBTypeContext;
+
+  @GetMapping("/api/charts/portfolio-chart")
+  @SecurityRequirement(name = "auth-header-bearer")
+  public DBOperationResult getPortfolioChart(Authentication authentication,
+    @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
+      required = false, defaultValue = "false") Boolean inspectQueries) {
+
+    AppUser appUser = fetchUser(authentication);
+    return chartDataService.fetchPortfolioChart(tradeXDBTypeContext.getDbType(), appUser.getId(),
+      inspectQueries);
+  }
 
 }

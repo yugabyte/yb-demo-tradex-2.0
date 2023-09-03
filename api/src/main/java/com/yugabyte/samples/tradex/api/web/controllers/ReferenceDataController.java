@@ -46,25 +46,28 @@ public class ReferenceDataController {
     RefDataService refDataService;
     @Value("${app.mylocation}")
     String instanceLocation;
+    @Autowired
+    TradeXDBTypeContext tradeXDBTypeContext;
+
 
     @GetMapping("/api/refdata/trafficLoc")
     public List<Location> getTrafficLocations() throws ApplicationServiceException {
-        return refDataService.getTrafficLocations(TradeXDBTypeContext.getDbType());
+        return refDataService.getTrafficLocations(tradeXDBTypeContext.getDbType());
     }
 
     @GetMapping("/api/refdata/dbtypes")
     public List<DBClusterInfo> getDbTypes() throws ApplicationServiceException {
-        return refDataService.getDbClusterTypes(TradeXDBTypeContext.getDbType());
+        return refDataService.getDbClusterTypes(tradeXDBTypeContext.getDbType());
     }
 
     @GetMapping("/api/refdata/symbols")
     public List<StockSymbol> getStockSymbols() {
-        return refDataService.getStockSymbols(TradeXDBTypeContext.getDbType());
+        return refDataService.getStockSymbols(tradeXDBTypeContext.getDbType());
     }
 
     @GetMapping("/api/refdata/dbnodes")
     public List<DBNode> getDbNodes() throws ApplicationServiceException {
-        return refDataService.getDBNodes(TradeXDBTypeContext.getDbType());
+        return refDataService.getDBNodes(tradeXDBTypeContext.getDbType());
     }
 
     @GetMapping("/api/refdata/dbnodeLocations")
@@ -78,12 +81,12 @@ public class ReferenceDataController {
         log.debug("AppServer: {}, User Location: {}, DB Cluster Type:{}", instanceLocation,
                 request.getHeader("x-user-location"), request.getHeader("x-tradex-db-type"));
 
-        if (TradeXDataSourceType.MULTI_REGION_MULTI_ZONE.equals(TradeXDBTypeContext.getDbType())) {
+        if (TradeXDataSourceType.MULTI_REGION_MULTI_ZONE.equals(tradeXDBTypeContext.getDbType())) {
             log.debug("Fetching first node from single");
             return getDbNodes().get(0);
         }
 
-        return getCloseNode(TradeXDBTypeContext.getDbType(), request.getHeader("x-user-location"));
+        return getCloseNode(tradeXDBTypeContext.getDbType(), request.getHeader("x-user-location"));
     }
 
     /*public static double distance(double x1, double y1, double x2, double y2) {

@@ -37,6 +37,9 @@ public class TradeController extends BaseController {
     @Autowired
     QueryStatsProvider enhancer;
 
+    @Autowired
+    TradeXDBTypeContext tradeXDBTypeContext;
+
     @GetMapping("/api/trades")
     @SecurityRequirement(name = "auth-header-bearer")
     public DBOperationResult fetchMyTrades(@RequestParam(name = "prevId", required = false,
@@ -45,7 +48,7 @@ public class TradeController extends BaseController {
                                            @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                    required = false, defaultValue = "false") Boolean inspectQueries) {
 
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
 
         AppUser appUser = fetchUser(authentication);
         ConnectionInfo connectionInfo = fetchConnectionInfo(appUser.getId().getPreferredRegion());
@@ -70,7 +73,7 @@ public class TradeController extends BaseController {
                                          @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER,
                                                  required = false, defaultValue = "false") Boolean inspectQueries) {
 
-        TradeXDataSourceType dbType = TradeXDBTypeContext.getDbType();
+        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
 
         AppUser appUser = fetchUser(authentication);
         ConnectionInfo connectionInfo = fetchConnectionInfo(appUser.getId().getPreferredRegion());

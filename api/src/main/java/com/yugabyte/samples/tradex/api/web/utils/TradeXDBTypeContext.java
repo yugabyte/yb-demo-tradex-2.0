@@ -1,20 +1,23 @@
 package com.yugabyte.samples.tradex.api.web.utils;
 
 import com.yugabyte.samples.tradex.api.config.TradeXDataSourceType;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 
+@Component
+@RequestScope
 public class TradeXDBTypeContext {
 
-    private static final ThreadLocal<TradeXDataSourceType> CONTEXT = new ThreadLocal<>();
 
-    public static void setDBType(TradeXDataSourceType type) {
-        CONTEXT.set(type);
-    }
+  @Value("${app.datasource_types}")
+  TradeXDataSourceType dbType;
 
-    public static TradeXDataSourceType getDbType() {
-        return null == CONTEXT.get() ? TradeXDataSourceType.MULTI_REGION_MULTI_ZONE : CONTEXT.get();
-    }
+  public void setDbType(TradeXDataSourceType dbType) {
+    this.dbType = dbType;
+  }
 
-    public static void clear() {
-        CONTEXT.remove();
-    }
+  public TradeXDataSourceType getDbType() {
+    return dbType;
+  }
 }

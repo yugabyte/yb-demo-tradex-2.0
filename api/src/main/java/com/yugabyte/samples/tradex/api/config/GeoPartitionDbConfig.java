@@ -12,8 +12,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
 
-@Configuration
-@Profile("GEO & yugabyte")
+//@Configuration
+//@Profile("GEO & yugabyte")
 public class GeoPartitionDbConfig {
 
     @Value("${app.geo-db.username}")

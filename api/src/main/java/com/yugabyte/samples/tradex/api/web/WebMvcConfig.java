@@ -1,8 +1,10 @@
 package com.yugabyte.samples.tradex.api.web;
 
 
+import com.yugabyte.samples.tradex.api.web.utils.TradeXDBTypeContext;
 import com.yugabyte.samples.tradex.api.web.utils.TradeXDbResolvingInterceptor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +25,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final Long maxAge = 3600L;
 //  @Value("${app.cors.allowed_origins}")
 //  private String[] allowedOrigins;
+
+    @Autowired
+    TradeXDBTypeContext tradeXDBTypeContext;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -51,7 +56,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new TradeXDbResolvingInterceptor());
+        registry.addInterceptor(new TradeXDbResolvingInterceptor(tradeXDBTypeContext));
         registry.addInterceptor(localeChangeInterceptor());
     }
 
