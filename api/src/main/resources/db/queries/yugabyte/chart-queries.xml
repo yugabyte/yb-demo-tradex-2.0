@@ -6,7 +6,7 @@
         <![CDATA[
        select price_time ,  trunc ( sum(cs.units * q.high_price), 2 ) as total,
         q.interval_period from current_stocks_v cs , stock_period_info_v q
-        where cs.user_id =:userId and cs.preferred_region =:prefRegion and cs.symbol_id = q.trade_symbol_id
+        where cs.user_id =:userId and q.preferred_region =:prefRegion and cs.preferred_region =:prefRegion and cs.symbol_id = q.trade_symbol_id
         group by price_time ,interval_period order by price_time desc , interval_period
     ]]>
     </entry>

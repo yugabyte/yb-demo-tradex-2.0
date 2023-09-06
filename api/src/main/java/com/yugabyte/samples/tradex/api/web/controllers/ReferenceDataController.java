@@ -34,8 +34,8 @@ public class ReferenceDataController {
             "USEAST1", "LONDON", "euwest2", "MUMBAI", "apsouth1", "SYDNEY", "apsoutheast2");
 
     //TODO move to refdata table
-    final Map<String, String> multiRegionProximityMap = Map.of("WASHINGTON", "USWEST1", "BOSTON",
-            "USEAST1", "LONDON", "useast2", "MUMBAI", "useast2", "SYDNEY", "useast2");
+    final Map<String, String> multiRegionProximityMap = Map.of("WASHINGTON", "us-west-1", "BOSTON",
+            "us-east-1", "LONDON", "us-east-2", "MUMBAI", "us-east-2", "SYDNEY", "us-east-2");
     final Map<String, String> readReplicaProximityMap = Map.of("WASHINGTON", "USWEST1", "BOSTON",
             "USEAST1", "LONDON", "USEAST1", "MUMBAI", "apsouth1", "SYDNEY", "apsouth1");
     final Map<String, String> geoProximityMap = Map.of("WASHINGTON", "USWEST2", "BOSTON",
@@ -78,41 +78,13 @@ public class ReferenceDataController {
         log.debug("AppServer: {}, User Location: {}, DB Cluster Type:{}", instanceLocation,
                 request.getHeader("x-user-location"), request.getHeader("x-tradex-db-type"));
 
-        if (TradeXDataSourceType.MULTI_REGION_MULTI_ZONE.equals(TradeXDBTypeContext.getDbType())) {
+        if (TradeXDataSourceType.SINGLE_REGION_MULTI_ZONE.equals(TradeXDBTypeContext.getDbType())) {
             log.debug("Fetching first node from single");
             return getDbNodes().get(0);
         }
 
         return getCloseNode(TradeXDBTypeContext.getDbType(), request.getHeader("x-user-location"));
     }
-
-    /*public static double distance(double x1, double y1, double x2, double y2) {
-        double x = Math.pow(x2 - x1, 2);
-        double y = Math.pow(y2 - y1, 2);
-        return Math.sqrt( x + y );
-    }
-
-    public static int nearestPoint(double[] coordinate, double[][] points) {
-        final int X = 0;
-        final int Y = 1;
-        int indexFound = 0;
-        double[] closestPoint = points[0];
-        double closestDist = distance(coordinate[X], coordinate[Y],
-                closestPoint[X], closestPoint[Y]);
-
-        // Traverse the array
-        for(int i = 0; i < points.length; i++) {
-            double dist = distance(coordinate[X], coordinate[Y],
-                    points[i][X], points[i][Y]);
-            if (dist < closestDist && dist != 0.0) {
-                closestDist = dist;
-                closestPoint = points[i];
-                indexFound = i;
-            }
-        }
-
-        return indexFound;
-    }*/
 
     @GetMapping("/api/refdata/dbhealth/regions")
     public Collection<YBRegion> getAllRegions() {
@@ -161,7 +133,7 @@ public class ReferenceDataController {
         }
 
         return dbNodes.stream()
-                .filter(e -> p1.equalsIgnoreCase(StringUtils.replace(e.getRegion(), "-", "")))
+                .filter(e -> p1.equalsIgnoreCase(StringUtils.replace(e.getRegion(), "-", "-")))
                 .findFirst().orElse(dbNodes.get(0));
 
     }

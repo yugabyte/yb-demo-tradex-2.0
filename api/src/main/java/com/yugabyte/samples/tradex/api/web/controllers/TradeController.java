@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.yugabyte.samples.tradex.api.utils.SqlQueries.TradeSql.FETCH_USER_TRADES;
+import static com.yugabyte.samples.tradex.api.utils.SqlQueries.TradeSql.INSERT_TRADE;
 
 @RestController
 @Slf4j
@@ -96,7 +97,7 @@ public class TradeController extends BaseController {
         parameters.addValue("preferredRegion", appUser.getId().getPreferredRegion());
 
 
-        return enhancer.loadTradeQueryStats(dbType, savedTradeId, inspectQueries,
-                parameters, FETCH_USER_TRADES, timeElapsed, connectionInfo);
+        return enhancer.loadTradeQueryStats(dbType, savedTradeId, false,
+                parameters, INSERT_TRADE, timeElapsed, connectionInfo);
     }
 }
