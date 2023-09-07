@@ -7,6 +7,7 @@ import com.yugabyte.samples.tradex.api.domain.db.TradeXStock;
 import com.yugabyte.samples.tradex.api.service.DBOperationResult;
 import com.yugabyte.samples.tradex.api.service.StockInfoService;
 import com.yugabyte.samples.tradex.api.service.TradeService;
+import com.yugabyte.samples.tradex.api.utils.ExecutedTradeOrderDetails;
 import com.yugabyte.samples.tradex.api.utils.QueryStatsProvider;
 import com.yugabyte.samples.tradex.api.web.dto.ConnectionInfo;
 import com.yugabyte.samples.tradex.api.web.dto.TradeOrderRequest;
@@ -77,13 +78,9 @@ public class TradeController extends BaseController {
         AppUser appUser = fetchUser(authentication);
         ConnectionInfo connectionInfo = fetchConnectionInfo(appUser.getId().getPreferredRegion());
 
-        Instant start = Instant.now();
-
         TradeXStock stock = stockInfoService.getStock(dbType, newTradeOrder.getSymbol(), false);
-        Integer savedTradeId = tradeService.save(dbType, newTradeOrder, stock.getId(),
+        ExecutedTradeOrderDetails orderDetails = tradeService.save(dbType, newTradeOrder, stock.getId(),
                 stock.getClosePrice(), appUser.getId().getId(), appUser.getId().getPreferredRegion());
-        log.info("Saved new trade entry: {}", savedTradeId);
-        long timeElapsed = Duration.between(start, Instant.now()).toMillis();
 
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("userId", appUser.getId().getId());
@@ -97,7 +94,7 @@ public class TradeController extends BaseController {
         parameters.addValue("preferredRegion", appUser.getId().getPreferredRegion());
 
 
-        return enhancer.loadTradeQueryStats(dbType, savedTradeId, false,
-                parameters, INSERT_TRADE, timeElapsed, connectionInfo);
+        return enhancer.loadTradeQueryStats(dbType, orderDetails.order_id, false,
+                parameters, INSERT_TRADE, orderDetails.dbTime, connectionInfo);
     }
 }

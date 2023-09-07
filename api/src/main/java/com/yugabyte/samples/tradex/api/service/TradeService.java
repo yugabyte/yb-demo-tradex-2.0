@@ -4,6 +4,7 @@ import com.yugabyte.samples.tradex.api.config.TradeXDataSourceType;
 import com.yugabyte.samples.tradex.api.domain.db.TradeOrder;
 import com.yugabyte.samples.tradex.api.domain.db.TradeXStock;
 import com.yugabyte.samples.tradex.api.utils.AppConstants;
+import com.yugabyte.samples.tradex.api.utils.ExecutedTradeOrderDetails;
 import com.yugabyte.samples.tradex.api.utils.SqlProvider;
 import com.yugabyte.samples.tradex.api.utils.SqlQueries.TradeSql;
 import com.yugabyte.samples.tradex.api.utils.TradeXJdbcTemplateResolver;
@@ -19,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +102,7 @@ public class TradeService {
         return stockInfoService.getStockSymbol(dbType, symbol_id);
     }
 
-    public Integer save(TradeXDataSourceType dbType, TradeOrderRequest newTradeOrder, Integer stockId,
+    public ExecutedTradeOrderDetails save(TradeXDataSourceType dbType, TradeOrderRequest newTradeOrder, Integer stockId,
                         BigDecimal closePrice, Integer userId, String preferredRegion) {
 
         NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
@@ -115,10 +118,12 @@ public class TradeService {
         parameterSource.addValue("payMethod", newTradeOrder.getPayMethod().name());
         parameterSource.addValue("order_time", LocalDateTime.now());
 
-        String[] keyColumnNames = {"ORDER_ID"};
-        template.update(queryProvider.getTradeSQL(TradeSql.INSERT_TRADE), parameterSource, keyHolder, keyColumnNames);
-
-        log.info("Inserted Trade id: {}", keyHolder.getKey());
-        return Objects.requireNonNull(keyHolder.getKey()).intValue();
+        String query = queryProvider.getTradeSQL(TradeSql.INSERT_TRADE);
+        long start = System.currentTimeMillis();
+        template.update(query, parameterSource, keyHolder);
+        long timeElapsed = System.currentTimeMillis() - start;
+        Number num = keyHolder.getKey();
+        log.info("Inserted Trade id: {}", num);
+        return new ExecutedTradeOrderDetails(timeElapsed, num.intValue());
     }
 }

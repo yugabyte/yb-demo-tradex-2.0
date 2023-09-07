@@ -34,7 +34,7 @@ public class ReferenceDataController {
             "USEAST1", "LONDON", "euwest2", "MUMBAI", "apsouth1", "SYDNEY", "apsoutheast2");
 
     //TODO move to refdata table
-    final Map<String, String> multiRegionProximityMap = Map.of("WASHINGTON", "us-west-1", "BOSTON",
+    final Map<String, String> multiRegionProximityMap = Map.of("WASHINGTON", "us-west-2", "BOSTON",
             "us-east-1", "LONDON", "us-east-2", "MUMBAI", "us-east-2", "SYDNEY", "us-east-2");
     final Map<String, String> readReplicaProximityMap = Map.of("WASHINGTON", "USWEST1", "BOSTON",
             "USEAST1", "LONDON", "USEAST1", "MUMBAI", "apsouth1", "SYDNEY", "apsouth1");
