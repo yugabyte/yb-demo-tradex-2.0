@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -27,11 +26,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class TradeService {
 
-  @Autowired
-  TradeXJdbcTemplateResolver jdbcTemplateResolver;
+  private final TradeXJdbcTemplateResolver jdbcTemplateResolver;
 
-  @Autowired
-  StockInfoService stockInfoService;
+  private final StockInfoService stockInfoService;
+
+  public TradeService(TradeXJdbcTemplateResolver jdbcTemplateResolver,
+    StockInfoService stockInfoService) {
+    this.jdbcTemplateResolver = jdbcTemplateResolver;
+    this.stockInfoService = stockInfoService;
+  }
 
 
   public void deleteAllUserTrades(TradeXDataSourceType dbType, int userId) {
