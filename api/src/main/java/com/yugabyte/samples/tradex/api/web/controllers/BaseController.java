@@ -11,21 +11,27 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class BaseController {
-    @Autowired
-    UserService userService;
-    @Autowired
-    ConnectionInfoRepo connectionInfoRepo;
 
-    @Autowired
-    TradeXDBTypeContext tradeXDBTypeContext;
-    public AppUser fetchUser(Authentication authentication) {
-        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return userService.findByEmail(dbType, userDetails.getUsername())
-                .orElseThrow( () -> new RuntimeException("User not found"));
-    }
+  public BaseController(
+    UserService userService,
+    ConnectionInfoRepo connectionInfoRepo,
+    TradeXDBTypeContext tradeXDBTypeContext) {
+    this.userService = userService;
+    this.connectionInfoRepo = connectionInfoRepo;
+    this.tradeXDBTypeContext = tradeXDBTypeContext;
+  }
 
-    public ConnectionInfo fetchConnectionInfo(String region) {
-        return connectionInfoRepo.fetchConnectionDetails(tradeXDBTypeContext.getDbType(), region);
-    }
+  protected UserService userService;
+  protected ConnectionInfoRepo connectionInfoRepo;
+  protected TradeXDBTypeContext tradeXDBTypeContext;
+  public AppUser fetchUser(Authentication authentication) {
+    TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
+    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    return userService.findByEmail(dbType, userDetails.getUsername())
+      .orElseThrow(() -> new RuntimeException("User not found"));
+  }
+
+  public ConnectionInfo fetchConnectionInfo(String region) {
+    return connectionInfoRepo.fetchConnectionDetails(tradeXDBTypeContext.getDbType(), region);
+  }
 }
