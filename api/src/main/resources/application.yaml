@@ -9,7 +9,7 @@ app:
   load_mock_data: ${APP_LOAD_MOCK_DATA:true}
   load_balance: ${APP_DB_LOADBALANCE:true}
   mylocation: ${APP_INSTANCE_LOCATION:WASHINGTON}
-  datasource_types: ${DATASOURCE_TYPES:MULTI_REGION_MULTI_ZONE}
+  datasource_types: ${DATASOURCE_TYPES:SINGLE_REGION_MULTI_ZONE}
   security:
     jwt:
       secret: cccccclvkgnllrhrngucjbivrehvjcnkfvfihildhfcg
@@ -158,7 +158,7 @@ spring:
     activate:
       on-profile: GEO & yugabyte
   datasource:
-    mr:
+    geo:
       url: jdbc:yugabytedb://127.0.0.1:5433/tradex_geo
       driver-class-name: com.yugabyte.Driver
       username: yugabyte
