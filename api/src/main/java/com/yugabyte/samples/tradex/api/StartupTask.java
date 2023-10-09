@@ -23,24 +23,24 @@ import org.springframework.stereotype.Component;
 public class StartupTask implements CommandLineRunner {
 
   private final List<Integer> sampleStockList = List.of(43, 67, 5, 66, 70, 22);
-  private final RefDataService dataService;
+  private final RefDataService refDataService;
   private final StockInfoService stockInfoService;
   private final TradeService tradeService;
   private final NamedParameterJdbcTemplate jdbcTemplate;
+  final TradesGenerator generator;
 
   @Value("${app.load_mock_data}")
   boolean loadMockData;
 
   @Value("${app.mylocation}")
   String location;
-  final TradesGenerator generator;
 
   @Value("${app.datasource_types}")
   TradeXDataSourceType[] tradeXInputDataSourceTypes;
 
-  public StartupTask(RefDataService dataService, StockInfoService stockInfoService,
+  public StartupTask(RefDataService refDataService, StockInfoService stockInfoService,
     TradeService tradeService, NamedParameterJdbcTemplate jdbcTemplate, TradesGenerator generator) {
-    this.dataService = dataService;
+    this.refDataService = refDataService;
     this.stockInfoService = stockInfoService;
     this.tradeService = tradeService;
     this.jdbcTemplate = jdbcTemplate;
@@ -51,7 +51,8 @@ public class StartupTask implements CommandLineRunner {
   public void run(String... args) throws Exception {
     Instant start = Instant.now();
     log.info(
-      "Application started. Number of REF_DATA entries: " + jdbcTemplate.queryForObject(Sql.RefData.CHECK_SQL,
+      "Application started. Number of REF_DATA entries: {}", jdbcTemplate.queryForObject(
+        Sql.RefData.CHECK_SQL,
         new HashMap<>(0), Integer.class));
     try {
 
@@ -59,9 +60,9 @@ public class StartupTask implements CommandLineRunner {
         log.info("Loading metadata - begin");
         stockInfoService.loadStockPerformance(false);
         for (TradeXDataSourceType t : tradeXInputDataSourceTypes) {
-          dataService.getDBNodes(t);
-          dataService.getDbClusterTypes(t);
-          dataService.getTrafficLocations(t);
+          refDataService.getDBNodes(t);
+          refDataService.getDbClusterTypes(t);
+          refDataService.getTrafficLocations(t);
 
           // generate few trade orders
           if ("BOSTON".equalsIgnoreCase(location)) {
@@ -85,7 +86,7 @@ public class StartupTask implements CommandLineRunner {
             tradeService.insertTrades(t, user2Trades, 2, "us-west-2");
           }
         }
-        dataService.getNodeLocations();
+        refDataService.getNodeLocations();
 
         log.info("Loading metadata - complete in {} millisecs",
           Duration.between(start, Instant.now())
