@@ -35,7 +35,7 @@ public class RefdataRepo {
     this.jdbcTemplateResolver = jdbcTemplateResolver;
   }
 
-  public <T> List fetchRefDataAsList(TradeXDataSourceType dataSourceType, String keyname,
+  public <T> List<T> fetchRefDataAsList(TradeXDataSourceType dataSourceType, String keyname,
     Class<T> targetType) throws ApplicationServiceException {
     try {
       NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dataSourceType);
