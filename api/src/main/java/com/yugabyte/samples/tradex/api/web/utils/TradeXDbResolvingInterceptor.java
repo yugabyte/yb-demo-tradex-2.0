@@ -20,7 +20,7 @@ public class TradeXDbResolvingInterceptor implements HandlerInterceptor {
     this.tradeXDBTypeContext = tradeXDBTypeContext;
   }
 
-  private TradeXDBTypeContext tradeXDBTypeContext;
+  private final TradeXDBTypeContext tradeXDBTypeContext;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
