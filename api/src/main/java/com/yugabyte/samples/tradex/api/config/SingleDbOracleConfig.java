@@ -27,7 +27,7 @@ public class SingleDbOracleConfig {
     @Bean
     @Qualifier("SINGLE_DB")
     public DataSource singleDBDataSource() {
-        HikariConfig singleConfig = hikariConfigProvider.getConfig();
+        HikariConfig singleConfig = hikariConfigProvider.getConfigOracle();
         singleConfig.setUsername(username);
         singleConfig.setPassword(password);
         singleConfig.setJdbcUrl(jdbcUrl);

@@ -27,7 +27,7 @@ function db_create(){
     -d \
     --name $yb_container \
     --hostname $yb_container \
-    -p 7000:7000 -p 9000:9000 -p 5433:5433 -p 9042:9042 \
+    -p 7000:7000 -p 9000:9000 -p 5433:5433 -p 9042:9042 -p 13000:13000 \
     -v $PROJECT_DIR/yb_data:/home/yugabyte/yb_data \
     $yb_image \
     bin/yugabyted start --base_dir=/home/yugabyte/yb_data --daemon=false

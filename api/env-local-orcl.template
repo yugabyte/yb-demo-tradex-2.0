@@ -1,0 +1,14 @@
+export APP_INSTANCE_LOCATION=BOSTON
+export APP_SINGLE_ORCL_DB_PWD=<your_password>
+export APP_SINGLE_ORCL_DB_URL=jdbc:oracle:thin:@<your_endpoint>:1521/ORCL
+export APP_SINGLE_ORCL_DB_USER=<your_username>
+
+export YB_API_HOST=http://localhost:7567
+export YB_API_TOKEN=487a2e7a-0c2
+export YB_API_CUST=59dc9199-adf4-4f2f-b267-c7a820f9dcfb
+
+export APP_DB_LOADBALANCE=false
+
+export SPRING_PROFILES_ACTIVE=oracle,SINGLE
+
+export DATASOURCE_TYPES=SINGLE_REGION_MULTI_ZONE

@@ -41,6 +41,9 @@ public class StartupTask implements CommandLineRunner {
     @Autowired
     TradesGenerator generator;
 
+    @Value("${app.datasource_types}")
+    TradeXDataSourceType[] tradeXInputDataSourceTypes;
+
     @Override
     public void run(String... args) throws Exception {
         Instant start = Instant.now();
@@ -54,7 +57,7 @@ public class StartupTask implements CommandLineRunner {
                 stockInfoService.loadStockPerformance(false);
                 List<TradeOrder> user1Trades = generator.generateTrades(354, 1, "boston", sampleStockList);
                 List<TradeOrder> user2Trades = generator.generateTrades(354, 2, "boston", sampleStockList);
-                for (TradeXDataSourceType t : TradeXDataSourceType.values()) {
+                for (TradeXDataSourceType t : tradeXInputDataSourceTypes) {
                     dataService.getDBNodes(t);
                     dataService.getDbClusterTypes(t);
                     dataService.getTrafficLocations(t);

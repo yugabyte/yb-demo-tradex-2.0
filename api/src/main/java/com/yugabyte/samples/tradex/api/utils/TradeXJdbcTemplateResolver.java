@@ -13,16 +13,16 @@ public class TradeXJdbcTemplateResolver {
     @Qualifier("SINGLE_DB_TEMPLATE")
     NamedParameterJdbcTemplate singleDbJdbcTemplate;
 
-    @Autowired
+    @Autowired(required = false)
     @Qualifier("MULTI_REGION_DB_TEMPLATE")
     NamedParameterJdbcTemplate multiRegionTemplate;
 
-    @Autowired
+    @Autowired(required = false)
     @Qualifier("MULTI_REGION_READ_REPLICA_DB_TEMPLATE")
     NamedParameterJdbcTemplate multiRegionReplicaTemplate;
 
 
-    @Autowired
+    @Autowired(required = false)
     @Qualifier("GEO_PARTITIONED_DB_TEMPLATE")
     NamedParameterJdbcTemplate geoDbJdbcTemplate;
 

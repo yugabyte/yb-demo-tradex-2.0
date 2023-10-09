@@ -31,4 +31,16 @@ public class HikariConfigProvider {
         config.setDataSourceProperties(poolProps);
         return config;
     }
+
+    public HikariConfig getConfigOracle() {
+        HikariConfig config = new HikariConfig();
+        config.setAutoCommit(true);
+        config.setMaximumPoolSize(maxPoolSize);
+        config.setMinimumIdle(minPoolSize);
+        config.setConnectionTestQuery("SELECT * FROM DUAL");
+        config.setConnectionTimeout(12000);
+        config.setKeepaliveTime(12000);
+        config.setIdleTimeout(12000);
+        return config;
+    }
 }

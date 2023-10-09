@@ -14,15 +14,15 @@ public class TradeXDataSourceResolver {
     @Qualifier("SINGLE_DB")
     DataSource singleDbDataSource;
 
-    @Autowired
+    @Autowired(required = false)
     @Qualifier("MULTI_REGION_DB")
     DataSource multiRegionDB;
 
-    @Autowired
+    @Autowired(required = false)
     @Qualifier("MULTI_REGION_READ_REPLICA_DB")
     DataSource multiNodeReadReplicaDB;
 
-    @Autowired
+    @Autowired(required = false)
     @Qualifier("GEO_PARTITIONED_DB")
     DataSource geoPartitionedDB;
 

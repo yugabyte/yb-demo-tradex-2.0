@@ -53,12 +53,12 @@
 
     <entry key="EXISTS_BY_EMAIL_SQL">
         <![CDATA[
-            select  exists ( select 1  from app_user au where au.email = :pEmail )
+            SELECT * FROM ( select 1  from app_user au where au.email = :pEmail )
     ]]>
     </entry>
     <entry key="VERIFY_USE_PIN_SQL">
         <![CDATA[
-        select exists ( select 1 from app_user au where au.id = :pUserId and au.preferred_region = :prefRegion and au.security_pin = :pUserPin)
+        SELECT * FROM ( select 1 from app_user au where au.id = :pUserId and au.preferred_region = :prefRegion and au.security_pin = :pUserPin)
     ]]>
     </entry>
 
@@ -72,7 +72,7 @@
            insert into app_user(preferred_region,email, passkey, enabled, user_language,
           personal_details,user_notifications,security_pin, created_date,updated_date) values
           ( :prefRegion, :uemail, :upasswd, :uenabled, :ulang, cast (:upersonaldet as json) ,
-           cast ( :unotifications as json), :usecuritypin, now(), now()) returning ID, PREFERRED_REGION
+           cast ( :unotifications as json), :usecuritypin, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) returning ID, PREFERRED_REGION
     ]]>
     </entry>
 

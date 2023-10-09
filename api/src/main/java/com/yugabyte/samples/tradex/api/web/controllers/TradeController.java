@@ -8,6 +8,7 @@ import com.yugabyte.samples.tradex.api.service.DBOperationResult;
 import com.yugabyte.samples.tradex.api.service.StockInfoService;
 import com.yugabyte.samples.tradex.api.service.TradeService;
 import com.yugabyte.samples.tradex.api.utils.QueryStatsProvider;
+import com.yugabyte.samples.tradex.api.utils.Sql.Trade;
 import com.yugabyte.samples.tradex.api.web.dto.ConnectionInfo;
 import com.yugabyte.samples.tradex.api.web.dto.TradeOrderRequest;
 import com.yugabyte.samples.tradex.api.web.utils.TradeXDBTypeContext;
@@ -24,8 +25,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static com.yugabyte.samples.tradex.api.utils.SqlQueries.TradeSql.FETCH_USER_TRADES;
 
 @RestController
 @Slf4j
@@ -61,8 +60,8 @@ public class TradeController extends BaseController {
         parameters.addValue("plimit", limit);
         parameters.addValue("prefRegion", appUser.getId().getPreferredRegion());
 
-        return enhancer.loadTradeQueryStats(dbType, tradeOrders, inspectQueries,
-                parameters, FETCH_USER_TRADES, timeElapsed, connectionInfo);
+        return enhancer.loadQueryStats(dbType, tradeOrders, inspectQueries,
+                parameters, Trade.FETCH_USER_TRADES, timeElapsed, connectionInfo);
     }
 
     @PostMapping("/api/trades")
@@ -96,7 +95,8 @@ public class TradeController extends BaseController {
         parameters.addValue("preferredRegion", appUser.getId().getPreferredRegion());
 
 
-        return enhancer.loadTradeQueryStats(dbType, savedTradeId, inspectQueries,
-                parameters, FETCH_USER_TRADES, timeElapsed, connectionInfo);
+        return enhancer.loadQueryStats(dbType, savedTradeId, inspectQueries,
+                parameters, Trade.FETCH_USER_TRADES, timeElapsed, connectionInfo);
+
     }
 }

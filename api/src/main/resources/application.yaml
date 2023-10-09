@@ -9,6 +9,7 @@ app:
   load_mock_data: ${APP_LOAD_MOCK_DATA:true}
   load_balance: ${APP_DB_LOADBALANCE}
   mylocation: ${APP_INSTANCE_LOCATION}
+  datasource_types: ${DATASOURCE_TYPES}
   security:
     jwt:
       secret: cccccclvkgnllrhrngucjbivrehvjcnkfvfihildhfcg
@@ -89,6 +90,7 @@ management:
 
 
 server:
+  port: 80
   compression:
     enabled: true
     mime-types: text/html,text/plain,text/xml,text/css,text/javascript,application/javascript,application/json
