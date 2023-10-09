@@ -58,8 +58,8 @@ public class AppUserRowMapper implements RowMapper<AppUser> {
     }
 
     if (hasColumn(rs, "security_pin")) {
-      Integer securityPin = rs.getInt("security_pin");
-      if (null != securityPin) {
+      int securityPin = rs.getInt("security_pin");
+      if (securityPin != 0) {
         user.setSecurityPin(securityPin);
       }
     }
