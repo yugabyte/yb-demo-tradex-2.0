@@ -1,0 +1,2 @@
+yfinance==0.2.4
+psycopg2-binary
