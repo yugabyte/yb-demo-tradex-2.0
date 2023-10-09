@@ -102,8 +102,8 @@ public class StockInfoController extends BaseController {
         Stock.ALL_ACTIVE_STOCKS, timeElapsed, connectionInfo);
 
     } catch (Exception e) {
-      log.error("Failed to fetch data for stock symbol. {}", e.getMessage());
-      log.trace("Failed to fetch data for stock symbol. {}", e);
+      log.error("Failed to fetch data for stock symbol. Message: {}", e.getMessage());
+      log.trace("Failed to fetch data for stock symbol.", e);
       throw e;
     }
 
@@ -141,7 +141,7 @@ public class StockInfoController extends BaseController {
 
     } catch (Exception e) {
       log.error("Failed to fetch data for stock symbol. Message: {}", e.getMessage());
-      log.trace("Failed to fetch data for stock symbol. Message: {}", e);
+      log.trace("Failed to fetch data for stock symbol.", e);
       throw e;
     }
 
