@@ -14,7 +14,7 @@ import com.yugabyte.samples.tradex.api.utils.TradeXJdbcTemplateResolver;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -26,137 +26,152 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 public class AppUserRepo {
 
-    @Autowired
-    TradeXJdbcTemplateResolver jdbcTemplateResolver;
-    @Autowired
-    AppUserParamUtils helper;
-    @Autowired
-    AppUserParamUtils paramUtils;
-    ObjectMapper mapper = new ObjectMapper();
+  private final AppUserRowMapper appUserRowMapper;
+  private final TradeXJdbcTemplateResolver jdbcTemplateResolver;
+  private final AppUserParamUtils helper;
+  private final AppUserParamUtils paramUtils;
 
-    public AppUser findByEmailId(TradeXDataSourceType dbType, String email) {
+  private final ObjectMapper applicationObjectMapper;
 
-        if (StringUtils.isEmpty(email) || !EmailValidator.isValidEmail(email)) {
-            log.error("Invalid Email Provided: {}", email);
-            throw new IllegalArgumentException("Invalid Email");
-        }
+  public AppUserRepo(TradeXJdbcTemplateResolver jdbcTemplateResolver, AppUserParamUtils helper,
+    AppUserParamUtils paramUtils, AppUserRowMapper appUserRowMapper,
+    @Qualifier("applicationObjectMapper")
+    ObjectMapper applicationObjectMapper) {
+    this.jdbcTemplateResolver = jdbcTemplateResolver;
+    this.helper = helper;
+    this.paramUtils = paramUtils;
+    this.appUserRowMapper = appUserRowMapper;
+    this.applicationObjectMapper = applicationObjectMapper;
+  }
 
-        try {
-            NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-            AppUser user = template.queryForObject(
-              User.FIND_BY_EMAIL_SQL, Map.of("pEmail", email),
-                    new AppUserRowMapper());
-            return user;
-        } catch (DataAccessException e) {
-            log.error("No User exists by email id: {}", email);
-            throw e;
-        }
+  public AppUser findByEmailId(TradeXDataSourceType dbType, String email) {
+
+    if (StringUtils.isEmpty(email) || !EmailValidator.isValidEmail(email)) {
+      log.error("Invalid Email Provided: {}", email);
+      throw new IllegalArgumentException("Invalid Email");
     }
 
-    public AppUser findByAppUserId(TradeXDataSourceType dbType, AppUserId id) {
+    try {
+      NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
+      AppUser user = template.queryForObject(
+        User.FIND_BY_EMAIL_SQL, Map.of("pEmail", email), appUserRowMapper);
+      return user;
+    } catch (DataAccessException e) {
+      log.error("No User exists by email id: {}", email);
+      throw e;
+    }
+  }
 
-        if (null == id || (id.getId() == null || StringUtils.isEmpty(id.getPreferredRegion()))) {
-            log.error("Invalid AppUser Id Provided: {}", id);
-            throw new IllegalArgumentException("Invalid AppUser id provided");
-        }
+  public AppUser findByAppUserId(TradeXDataSourceType dbType, AppUserId id) {
 
-        try {
-            NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-            return template.queryForObject(User.FIND_BY_ID,
-                    Map.of("uid", id.getId(), "prefRegion",
-                            id.getPreferredRegion()), new AppUserRowMapper());
-        } catch (DataAccessException e) {
-            log.error("No User exists by id: {}, prefRegion:{}", id.getId(), id.getPreferredRegion());
-            throw e;
-        }
+    if (null == id || (id.getId() == null || StringUtils.isEmpty(id.getPreferredRegion()))) {
+      log.error("Invalid AppUser Id Provided: {}", id);
+      throw new IllegalArgumentException("Invalid AppUser id provided");
     }
 
-    public Boolean userExists(TradeXDataSourceType dbType, String email) {
+    try {
+      NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
+      return template.queryForObject(User.FIND_BY_ID,
+        Map.of("uid", id.getId(), "prefRegion",
+          id.getPreferredRegion()), appUserRowMapper);
+    } catch (DataAccessException e) {
+      log.error("No User exists by id: {}, prefRegion:{}", id.getId(), id.getPreferredRegion());
+      throw e;
+    }
+  }
 
-        if (StringUtils.isEmpty(email) || !EmailValidator.isValidEmail(email)) {
-            log.error("Invalid Email Provided: {}", email);
-            throw new IllegalArgumentException("Invalid Email");
-        }
+  public Boolean userExists(TradeXDataSourceType dbType, String email) {
 
-        NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-        return template.queryForObject(User.EXISTS_BY_EMAIL_SQL, Map.of("pEmail", email),
-                (rs, rowNum) -> rs.getBoolean(1));
+    if (StringUtils.isEmpty(email) || !EmailValidator.isValidEmail(email)) {
+      log.error("Invalid Email Provided: {}", email);
+      throw new IllegalArgumentException("Invalid Email");
     }
 
-    public Boolean verifyPin(TradeXDataSourceType dbType, AppUserId appUserId, Integer pin) {
+    NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
+    return template.queryForObject(User.EXISTS_BY_EMAIL_SQL, Map.of("pEmail", email),
+      (rs, rowNum) -> rs.getBoolean(1));
+  }
 
-        if (null == appUserId || (appUserId.getId() == null || StringUtils.isEmpty(appUserId.getPreferredRegion()))) {
-            log.error("Invalid AppUser Id Provided: {}", appUserId);
-            throw new IllegalArgumentException("Invalid AppUser id provided");
-        }
+  public Boolean verifyPin(TradeXDataSourceType dbType, AppUserId appUserId, Integer pin) {
 
-        NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-        return template.queryForObject(User.VERIFY_USE_PIN_SQL,
-                Map.of("pUserId", appUserId.getId(),
-                        "pUserPin", pin, "prefRegion", appUserId.getPreferredRegion()),
-                (rs, rowNum) -> rs.getBoolean(1));
+    if (null == appUserId || (appUserId.getId() == null || StringUtils.isEmpty(
+      appUserId.getPreferredRegion()))) {
+      log.error("Invalid AppUser Id Provided: {}", appUserId);
+      throw new IllegalArgumentException("Invalid AppUser id provided");
     }
 
-    public int updateAppUser(TradeXDataSourceType dbType, AppUser modifiedUser) {
-        NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
+    NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
+    return template.queryForObject(User.VERIFY_USE_PIN_SQL,
+      Map.of("pUserId", appUserId.getId(),
+        "pUserPin", pin, "prefRegion", appUserId.getPreferredRegion()),
+      (rs, rowNum) -> rs.getBoolean(1));
+  }
 
-        if (userExists(dbType, modifiedUser.getEmail())) {
-            MapSqlParameterSource params = paramUtils.getSQLParams(modifiedUser, modifiedUser.getId().getPreferredRegion());
-            params.addValue("uid", modifiedUser.getId().getId());
-            //params.addValue("passKey", modifiedUser.getPasskey());
-            int rowUpdated = template.update(User.UPDATE_APP_USER, params);
-            return rowUpdated;
-        }
+  public int updateAppUser(TradeXDataSourceType dbType, AppUser modifiedUser) {
+    NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
 
-        throw new IllegalArgumentException("User not found");
+    if (userExists(dbType, modifiedUser.getEmail())) {
+      MapSqlParameterSource params = paramUtils.getSQLParams(modifiedUser, modifiedUser.getId()
+        .getPreferredRegion());
+      params.addValue("uid", modifiedUser.getId()
+        .getId());
+      //params.addValue("passKey", modifiedUser.getPasskey());
+      int rowUpdated = template.update(User.UPDATE_APP_USER, params);
+      return rowUpdated;
     }
 
-    public int modifyUserFavourites(TradeXDataSourceType dbType, AppUserId userId, Integer[] favs) {
-        NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-        int rowUpdated = template.update(User.UPDATE_USER_FAV,
-                Map.of("uid", userId.getId(), "prefRegion", userId.getPreferredRegion(),
-                        "favourites", favs));
-        return rowUpdated;
-    }
+    throw new IllegalArgumentException("User not found");
+  }
 
-    public AppUserId createNewUser(TradeXDataSourceType dbType, AppUser user, String prefRegion) {
-        NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-        MapSqlParameterSource mapSqlParameterSource = helper.getSQLParams(user, prefRegion);
-        KeyHolder holder = new GeneratedKeyHolder();
-        template.update(User.INSERT_APP_USER, mapSqlParameterSource,
-                holder, new String[]{"ID", "PREFERRED_REGION"});
-        AppUserId createdId = new AppUserId((Integer) holder.getKeys().get("id"),
-                (String) holder.getKeys().get("preferred_region"));
-        log.info("INSERTED KEYHOLDER: {}", holder.getKeys());
-        return createdId;
-    }
+  public int modifyUserFavourites(TradeXDataSourceType dbType, AppUserId userId, Integer[] favs) {
+    NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
+    int rowUpdated = template.update(User.UPDATE_USER_FAV,
+      Map.of("uid", userId.getId(), "prefRegion", userId.getPreferredRegion(),
+        "favourites", favs));
+    return rowUpdated;
+  }
 
-    public int updateNotifications(TradeXDataSourceType dbType, AppUserId userId, UserNotifications notifications) {
-        NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-        int rowUpdated = 0;
-        try {
-            rowUpdated = template.update(User.UPDATE_USER_NOTIF,
-                    Map.of("uid", userId.getId(), "prefRegion", userId.getPreferredRegion(),
-                            "pNotif", mapper.writeValueAsString(notifications)));
-            return rowUpdated;
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
+  public AppUserId createNewUser(TradeXDataSourceType dbType, AppUser user, String prefRegion) {
+    NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
+    MapSqlParameterSource mapSqlParameterSource = helper.getSQLParams(user, prefRegion);
+    KeyHolder holder = new GeneratedKeyHolder();
+    template.update(User.INSERT_APP_USER, mapSqlParameterSource,
+      holder, new String[]{"ID", "PREFERRED_REGION"});
+    AppUserId createdId = new AppUserId((Integer) holder.getKeys()
+      .get("id"),
+      (String) holder.getKeys()
+        .get("preferred_region"));
+    log.info("INSERTED KEYHOLDER: {}", holder.getKeys());
+    return createdId;
+  }
 
-    public int updateLanguage(TradeXDataSourceType dbType, AppUserId userId, String langCode) {
-        NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-        int rowUpdated = template.update(User.UPDATE_USER_LANG,
-                Map.of("uid", userId.getId(), "prefRegion", userId.getPreferredRegion(),
-                        "langCode", langCode));
-        return rowUpdated;
+  public int updateNotifications(TradeXDataSourceType dbType, AppUserId userId,
+    UserNotifications notifications) {
+    NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
+    int rowUpdated = 0;
+    try {
+      rowUpdated = template.update(User.UPDATE_USER_NOTIF,
+        Map.of("uid", userId.getId(), "prefRegion", userId.getPreferredRegion(),
+          "pNotif", applicationObjectMapper.writeValueAsString(notifications)));
+      return rowUpdated;
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e.getMessage());
     }
+  }
 
-    public int updatePassword(TradeXDataSourceType dbType, String email, String newPasskey) {
-        NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-        int rowUpdated = template.update(User.UPDATE_APP_USER_PWD,
-                Map.of("uemail", email, "passKey", newPasskey));
-        return rowUpdated;
-    }
+  public int updateLanguage(TradeXDataSourceType dbType, AppUserId userId, String langCode) {
+    NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
+    int rowUpdated = template.update(User.UPDATE_USER_LANG,
+      Map.of("uid", userId.getId(), "prefRegion", userId.getPreferredRegion(),
+        "langCode", langCode));
+    return rowUpdated;
+  }
+
+  public int updatePassword(TradeXDataSourceType dbType, String email, String newPasskey) {
+    NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
+    int rowUpdated = template.update(User.UPDATE_APP_USER_PWD,
+      Map.of("uemail", email, "passKey", newPasskey));
+    return rowUpdated;
+  }
 
 }
