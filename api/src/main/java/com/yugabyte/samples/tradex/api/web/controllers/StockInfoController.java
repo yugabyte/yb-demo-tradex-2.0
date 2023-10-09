@@ -20,7 +20,6 @@ import java.time.Instant;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -35,17 +34,17 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class StockInfoController extends BaseController {
 
-  @Autowired
-  StockInfoService stockInfoService;
-  @Autowired
-  UserService userService;
-  @Autowired
-  ConnectionInfoRepo connectionInfoRepo;
-  @Autowired
-  QueryStatsProvider enhancer;
+  private final StockInfoService stockInfoService;
+  private final QueryStatsProvider queryStatsProvider;
 
-    @Autowired
-    TradeXDBTypeContext tradeXDBTypeContext;
+  public StockInfoController(UserService userService, ConnectionInfoRepo connectionInfoRepo,
+    TradeXDBTypeContext tradeXDBTypeContext, StockInfoService stockInfoService,
+    QueryStatsProvider queryStatsProvider) {
+    super(userService, connectionInfoRepo, tradeXDBTypeContext);
+    this.stockInfoService = stockInfoService;
+    this.queryStatsProvider = queryStatsProvider;
+  }
+
 
   @GetMapping("/api/stocks/{symbol}")
   @Operation(summary = "Fetch Stock Info from yahoo")
@@ -60,7 +59,7 @@ public class StockInfoController extends BaseController {
     TradeXStock data;
     Instant start = Instant.now();
 
-        TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
+    TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
     AppUser user = fetchUser(authentication);
     ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType, user.getId()
       .getPreferredRegion());
@@ -75,7 +74,7 @@ public class StockInfoController extends BaseController {
     MapSqlParameterSource parameters = new MapSqlParameterSource();
     parameters.addValue("psymbol", symbol);
 
-    return enhancer.loadQueryStats(dbType, data, inspectQueries, parameters,
+    return queryStatsProvider.loadQueryStats(dbType, data, inspectQueries, parameters,
       Stock.STOCK_BY_SYMBOL_SQL, timeElapsed, connectionInfo);
 
   }
@@ -92,7 +91,7 @@ public class StockInfoController extends BaseController {
 
     try {
 
-            TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
+      TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
       AppUser user = fetchUser(authentication);
       ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType, user.getId()
         .getPreferredRegion());
@@ -101,8 +100,8 @@ public class StockInfoController extends BaseController {
       long timeElapsed = Duration.between(start, Instant.now())
         .toMillis();
 
-      return enhancer.loadQueryStats(dbType, data, inspectQueries, new MapSqlParameterSource(),
-        Stock.ALL_ACTIVE_STOCKS, timeElapsed, connectionInfo);
+      return queryStatsProvider.loadQueryStats(dbType, data, inspectQueries,
+        new MapSqlParameterSource(), Stock.ALL_ACTIVE_STOCKS, timeElapsed, connectionInfo);
 
     } catch (Exception e) {
       log.error("Failed to fetch data for stock symbol. Message: {}", e.getMessage());
@@ -119,7 +118,7 @@ public class StockInfoController extends BaseController {
   public DBOperationResult fetchFavStocks(Authentication authentication,
     @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER, required = false, defaultValue = "false") Boolean inspectQueries) {
     try {
-            TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
+      TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
 
       AppUser appUser = fetchUser(authentication);
       ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType,
@@ -139,7 +138,7 @@ public class StockInfoController extends BaseController {
       params.addValue("prefRegion", appUser.getId()
         .getPreferredRegion());
 
-      return enhancer.loadQueryStats(dbType, data, inspectQueries, params,
+      return queryStatsProvider.loadQueryStats(dbType, data, inspectQueries, params,
         Stock.APP_USER_FAV_STOCKS, timeElapsed, connectionInfo);
 
     } catch (Exception e) {
