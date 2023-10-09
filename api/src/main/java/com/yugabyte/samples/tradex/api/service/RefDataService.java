@@ -11,7 +11,7 @@ import com.yugabyte.samples.tradex.api.domain.business.Location;
 import com.yugabyte.samples.tradex.api.domain.business.StockSymbol;
 import com.yugabyte.samples.tradex.api.domain.repo.RefdataRepo;
 import com.yugabyte.samples.tradex.api.domain.repo.StockRepo;
-import com.yugabyte.samples.tradex.api.utils.AppConstants;
+import com.yugabyte.samples.tradex.api.utils.AppConstants.Caches;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
@@ -67,21 +67,21 @@ public class RefDataService {
   public List<Location> getTrafficLocations(TradeXDataSourceType dataSourceType)
     throws ApplicationServiceException {
     return refdataRepo.fetchRefDataAsList(dataSourceType,
-      AppConstants.Caches.TRAFFIC_LOCATIONS.name(), Location.class);
+      Caches.TRAFFIC_LOCATIONS.name(), Location.class);
   }
 
   @Cacheable("DB_CLUSTER_TYPES")
   public List<DBClusterInfo> getDbClusterTypes(TradeXDataSourceType dataSourceType)
     throws ApplicationServiceException {
     return refdataRepo.fetchRefDataAsList(dataSourceType,
-      AppConstants.Caches.DB_CLUSTER_TYPES.name(), DBClusterInfo.class);
+      Caches.DB_CLUSTER_TYPES.name(), DBClusterInfo.class);
   }
 
   @Cacheable("DEFAULT_NODE_LOCATIONS")
   public List<Location> getDefaultNodeLocations(TradeXDataSourceType dataSourceType)
     throws ApplicationServiceException {
     return refdataRepo.fetchRefDataAsList(dataSourceType,
-      AppConstants.Caches.DEFAULT_NODE_LOCATIONS.name(), Location.class);
+      Caches.DEFAULT_NODE_LOCATIONS.name(), Location.class);
   }
 
   @Cacheable("STOCK_SYMBOLS")
@@ -112,7 +112,7 @@ public class RefDataService {
 
     return refdataRepo.fetchDBNodes(dataSourceType)
       .stream()
-      .map(e -> {
+      .peek(e -> {
 
         String regionLookupKey = StringUtils.replace(e.getRegion(), "-", "-");
         Location loc =
@@ -124,7 +124,6 @@ public class RefDataService {
           log.warn("Location details are missing for lookupKey: {}", regionLookupKey);
         }
         e.setLocation(loc);
-        return e;
       })
       .collect(Collectors.toList());
   }
