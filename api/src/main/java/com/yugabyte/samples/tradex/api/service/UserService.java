@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,13 +31,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class UserService implements UserDetailsService {
 
-  final ObjectMapper mapper = new ObjectMapper();
-  @Autowired
-  ConnectionInfoRepo connectionInfoRepo;
-  @Autowired
-  AppUserRepo appUserRepo;
-  @Autowired
-  AppUserParamUtils paramUtils;
+
+  private final ConnectionInfoRepo connectionInfoRepo;
+  private final AppUserRepo appUserRepo;
+  private final AppUserParamUtils paramUtils;
+
+  private final ObjectMapper applicationObjectMapper;
+
+  final TradeXDBTypeContext tradeXDBTypeContext;
+
+  public UserService(ConnectionInfoRepo connectionInfoRepo, AppUserRepo appUserRepo,
+    AppUserParamUtils paramUtils, @Qualifier("applicationObjectMapper") ObjectMapper applicationObjectMapper, TradeXDBTypeContext tradeXDBTypeContext) {
+    this.connectionInfoRepo = connectionInfoRepo;
+    this.appUserRepo = appUserRepo;
+    this.paramUtils = paramUtils;
+    this.applicationObjectMapper = applicationObjectMapper;
+    this.tradeXDBTypeContext = tradeXDBTypeContext;
+  }
 
   @Transactional(readOnly = true)
   public Optional<AppUser> findByEmail(TradeXDataSourceType dbType, String email) {
@@ -60,7 +70,7 @@ public class UserService implements UserDetailsService {
     return appUserRepo.userExists(dbType, email);
   }
 
-  @Transactional(readOnly = false)
+  @Transactional()
   public DBOperationResult createNewUser(TradeXDataSourceType dbType, AppUser user,
     String prefRegion) {
 
@@ -78,7 +88,7 @@ public class UserService implements UserDetailsService {
       connectionInfo);
   }
 
-  @Transactional(readOnly = false)
+  @Transactional()
   public DBOperationResult updateUser(TradeXDataSourceType dbType, AppUser modifiedUser) {
 
     Instant start = Instant.now();
@@ -96,18 +106,18 @@ public class UserService implements UserDetailsService {
       .toMillis(), connectionInfo);
   }
 
-  @Transactional(readOnly = false)
+  @Transactional()
   public DBOperationResult updateUserFavourites(TradeXDataSourceType dbType, AppUserId appUserId,
-    Integer[] favs) {
+    Integer[] favorites) {
 
     ConnectionInfo connectionInfo = connectionInfoRepo.fetchConnectionDetails(dbType,
       appUserId.getPreferredRegion());
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("prefRegion", appUserId.getPreferredRegion());
     params.addValue("uid", appUserId.getId());
-    params.addValue("favourites", favs);
+    params.addValue("favourites", favorites);
     Instant start = Instant.now();
-    int rowUpdated = appUserRepo.modifyUserFavourites(dbType, appUserId, favs);
+    int rowUpdated = appUserRepo.modifyUserFavourites(dbType, appUserId, favorites);
 
     long queryTime = Duration.between(start, Instant.now())
       .toMillis();
@@ -117,7 +127,7 @@ public class UserService implements UserDetailsService {
         QueryParamDisplayUtils.getParameters(params)), null, queryTime, connectionInfo);
   }
 
-  @Transactional(readOnly = false)
+  @Transactional()
   public DBOperationResult updateUserNotifications(TradeXDataSourceType dbType, AppUserId appUserId,
     UserNotifications notifications) {
 
@@ -127,7 +137,7 @@ public class UserService implements UserDetailsService {
       MapSqlParameterSource params = new MapSqlParameterSource();
       params.addValue("prefRegion", appUserId.getPreferredRegion());
       params.addValue("uid", appUserId.getId());
-      params.addValue("pNotif", mapper.writeValueAsString(notifications));
+      params.addValue("pNotif", applicationObjectMapper.writeValueAsString(notifications));
       Instant start = Instant.now();
       int rowUpdated = appUserRepo.updateNotifications(dbType, appUserId, notifications);
 
@@ -143,7 +153,7 @@ public class UserService implements UserDetailsService {
     }
   }
 
-  @Transactional(readOnly = false)
+  @Transactional()
   public DBOperationResult updateUserLanguage(TradeXDataSourceType dbType, AppUserId appUserId,
     String langCode) {
 
@@ -166,7 +176,7 @@ public class UserService implements UserDetailsService {
   }
 
 
-  @Transactional(readOnly = false)
+  @Transactional()
   public DBOperationResult updatePasskey(TradeXDataSourceType dbType, String email,
     String newPassKey, String prefRegion) {
 
@@ -189,7 +199,7 @@ public class UserService implements UserDetailsService {
   @Transactional(readOnly = true)
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    AppUser appUser = appUserRepo.findByEmailId(TradeXDBTypeContext.getDbType(), username);
+    AppUser appUser = appUserRepo.findByEmailId(tradeXDBTypeContext.getDbType(), username);
     return new org.springframework.security.core.userdetails.User(appUser.getEmail(),
       appUser.getPasskey(), appUser.getEnabled(), false, false, false, Collections.emptyList());
   }
