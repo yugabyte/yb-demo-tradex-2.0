@@ -6,7 +6,6 @@ import com.yugabyte.samples.tradex.api.domain.repo.ConnectionInfoRepo;
 import com.yugabyte.samples.tradex.api.service.UserService;
 import com.yugabyte.samples.tradex.api.web.dto.ConnectionInfo;
 import com.yugabyte.samples.tradex.api.web.utils.TradeXDBTypeContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 
