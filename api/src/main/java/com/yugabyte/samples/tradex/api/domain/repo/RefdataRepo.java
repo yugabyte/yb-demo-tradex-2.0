@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -26,20 +26,24 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 public class RefdataRepo {
 
-  final ObjectMapper mapper = new ObjectMapper();
-  @Autowired
-  TradeXJdbcTemplateResolver jdbcTemplateResolver;
+  private final ObjectMapper applicationObjectMapper;
+  private final TradeXJdbcTemplateResolver jdbcTemplateResolver;
 
-  public List fetchRefDataAsList(TradeXDataSourceType dataSourceType, String keyname,
-    Class targetType) throws ApplicationServiceException {
+  public RefdataRepo(@Qualifier("applicationObjectMapper") ObjectMapper applicationObjectMapper,
+    TradeXJdbcTemplateResolver jdbcTemplateResolver) {
+    this.applicationObjectMapper = applicationObjectMapper;
+    this.jdbcTemplateResolver = jdbcTemplateResolver;
+  }
+
+  public <T> List fetchRefDataAsList(TradeXDataSourceType dataSourceType, String keyname,
+    Class<T> targetType) throws ApplicationServiceException {
     try {
       NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dataSourceType);
       RefDatum refData = template.queryForObject(Sql.RefData.REFDATA_BY_KEY_SQL,
         Map.of("pKeyName", keyname), (rs, rowNum) -> {
           RefDatum r = new RefDatum();
-          r.setId(new RefDatumId(rs.getInt("id"),
-            rs.getString("key_name"),
-            rs.getString("classifier")));
+          r.setId(
+            new RefDatumId(rs.getInt("id"), rs.getString("key_name"), rs.getString("classifier")));
 
           r.setKeyValue(rs.getString("key_value"));
           return r;
@@ -49,10 +53,10 @@ public class RefdataRepo {
         return Collections.emptyList();
       }
 
-      ObjectNode node = mapper.readValue(refData.getKeyValue(), ObjectNode.class);
+      ObjectNode node = applicationObjectMapper.readValue(refData.getKeyValue(), ObjectNode.class);
       JsonNode locations = node.get(keyname);
-      TypeFactory typeFactory = mapper.getTypeFactory();
-      return mapper.treeToValue(locations,
+      TypeFactory typeFactory = applicationObjectMapper.getTypeFactory();
+      return applicationObjectMapper.treeToValue(locations,
         typeFactory.constructCollectionType(List.class, targetType));
     } catch (JsonProcessingException e) {
       log.error("Failed parsing refdata: {}", e.getMessage());
@@ -63,18 +67,11 @@ public class RefdataRepo {
   public List<DBNode> fetchDBNodes(TradeXDataSourceType dataSourceType) {
     NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dataSourceType);
     return template.query(Sql.RefData.FETCH_DB_NODES, (rs, rowNum) -> {
-        String region = rs.getString("region");
+      String region = rs.getString("region");
 
-        return new DBNode(
-          UUID.randomUUID()
-            .toString(),
-          region,
-          rs.getString("zone"),
-          rs.getString("node_type"),
-          null
-        );
-      }
-    );
+      return new DBNode(UUID.randomUUID()
+        .toString(), region, rs.getString("zone"), rs.getString("node_type"), null);
+    });
   }
 
 }
