@@ -77,7 +77,8 @@ public class UserProfileController extends BaseController {
         try {
             return portfolioService.getPortfolio(TradeXDBTypeContext.getDbType(), user.getEmail());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error in processing portfolio requests: {}", e.getMessage());
+            log.trace("Error in processing portfolio requests: {}", e );
             throw e;
         }
     }
