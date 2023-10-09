@@ -22,38 +22,6 @@ app:
       custid: ${YB_API_CUST}
       authtoken: ${YB_API_TOKEN}
 
-#  srmz-db:
-#    username: ${APP_SINGLE_DB_USER}
-#    password: ${APP_SINGLE_DB_PWD}
-#    jdbcUrl: ${APP_SINGLE_DB_URL}
-#
-#    topology-keys: ${APP_SINGLE_DB_TP_KEYS}
-#
-#  orcl-srmz-db:
-#    username: ${APP_SINGLE_ORCL_DB_USER}
-#    password: ${APP_SINGLE_ORCL_DB_PWD}
-#    jdbcUrl: ${APP_SINGLE_ORCL_DB_URL}
-#
-#  mrmz-db:
-#    username: ${APP_MULTI_REGION_DB_USER}
-#    password: ${APP_MULTI_REGION_DB_PWD}
-#    jdbcUrl: ${APP_MULTI_REGION_DB_URL}
-#    topology-keys: ${APP_MULTI_REGION_DB_TP_KEYS}
-#
-#  mrrr-db:
-#    username: ${APP_MULTI_REGION_READ_REPLICA_DB_USER}
-#    password: ${APP_MULTI_REGION_READ_REPLICA_DB_PWD}
-#    jdbcUrl: ${APP_MULTI_REGION_READ_REPLICA_DB_URL}
-#
-#    topology-keys: ${APP_MULTI_REGION_READ_REPLICA_DB_TP_KEYS}
-#
-#  geo-db:
-#    username: ${APP_GEO_PART_DB_USER}
-#    password: ${APP_GEO_PART_DB_PWD}
-#    jdbcUrl: ${APP_GEO_PART_DB_URL}
-#    topology-keys: ${APP_GEO_PART_DB_TP_KEYS}
-
-
 spring:
   application:
     name: trading-api
