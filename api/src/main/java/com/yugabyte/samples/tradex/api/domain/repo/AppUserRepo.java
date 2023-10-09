@@ -12,6 +12,7 @@ import com.yugabyte.samples.tradex.api.utils.EmailValidator;
 import com.yugabyte.samples.tradex.api.utils.Sql.User;
 import com.yugabyte.samples.tradex.api.utils.TradeXJdbcTemplateResolver;
 import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -53,9 +54,8 @@ public class AppUserRepo {
 
     try {
       NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-      AppUser user = template.queryForObject(
+      return template.queryForObject(
         User.FIND_BY_EMAIL_SQL, Map.of("pEmail", email), appUserRowMapper);
-      return user;
     } catch (DataAccessException e) {
       log.error("No User exists by email id: {}", email);
       throw e;
@@ -116,8 +116,7 @@ public class AppUserRepo {
       params.addValue("uid", modifiedUser.getId()
         .getId());
       //params.addValue("passKey", modifiedUser.getPasskey());
-      int rowUpdated = template.update(User.UPDATE_APP_USER, params);
-      return rowUpdated;
+      return template.update(User.UPDATE_APP_USER, params);
     }
 
     throw new IllegalArgumentException("User not found");
@@ -125,10 +124,9 @@ public class AppUserRepo {
 
   public int modifyUserFavourites(TradeXDataSourceType dbType, AppUserId userId, Integer[] favs) {
     NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-    int rowUpdated = template.update(User.UPDATE_USER_FAV,
+    return template.update(User.UPDATE_USER_FAV,
       Map.of("uid", userId.getId(), "prefRegion", userId.getPreferredRegion(),
         "favourites", favs));
-    return rowUpdated;
   }
 
   public AppUserId createNewUser(TradeXDataSourceType dbType, AppUser user, String prefRegion) {
@@ -137,7 +135,7 @@ public class AppUserRepo {
     KeyHolder holder = new GeneratedKeyHolder();
     template.update(User.INSERT_APP_USER, mapSqlParameterSource,
       holder, new String[]{"ID", "PREFERRED_REGION"});
-    AppUserId createdId = new AppUserId((Integer) holder.getKeys()
+    AppUserId createdId = new AppUserId((Integer) Objects.requireNonNull(holder.getKeys())
       .get("id"),
       (String) holder.getKeys()
         .get("preferred_region"));
@@ -148,7 +146,7 @@ public class AppUserRepo {
   public int updateNotifications(TradeXDataSourceType dbType, AppUserId userId,
     UserNotifications notifications) {
     NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-    int rowUpdated = 0;
+    int rowUpdated;
     try {
       rowUpdated = template.update(User.UPDATE_USER_NOTIF,
         Map.of("uid", userId.getId(), "prefRegion", userId.getPreferredRegion(),
@@ -161,17 +159,15 @@ public class AppUserRepo {
 
   public int updateLanguage(TradeXDataSourceType dbType, AppUserId userId, String langCode) {
     NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-    int rowUpdated = template.update(User.UPDATE_USER_LANG,
+    return template.update(User.UPDATE_USER_LANG,
       Map.of("uid", userId.getId(), "prefRegion", userId.getPreferredRegion(),
         "langCode", langCode));
-    return rowUpdated;
   }
 
   public int updatePassword(TradeXDataSourceType dbType, String email, String newPasskey) {
     NamedParameterJdbcTemplate template = jdbcTemplateResolver.resolve(dbType);
-    int rowUpdated = template.update(User.UPDATE_APP_USER_PWD,
+    return template.update(User.UPDATE_APP_USER_PWD,
       Map.of("uemail", email, "passKey", newPasskey));
-    return rowUpdated;
   }
 
 }
