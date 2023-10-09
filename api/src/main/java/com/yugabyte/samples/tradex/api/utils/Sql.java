@@ -19,11 +19,16 @@ public class Sql {
   public static class RefData {
     public static final String REFDATA_BY_KEY_SQL = """
       select *
-      from public.ref_data r where r.key_name = :pKeyName
+      from public.ref_data r
+      where r.key_name = :pKeyName
     """;
 
     public static final String FETCH_DB_NODES = """
       select region, zone, node_type from yb_servers()
+    """;
+    public static final String CHECK_SQL = """
+      select count(*)
+      from REF_DATA
     """;
   }
 
