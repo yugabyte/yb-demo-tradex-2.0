@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.thymeleaf.util.LoggingUtils;
 
 @RestController
 @CrossOrigin
@@ -102,8 +104,8 @@ public class StockInfoController extends BaseController {
         Stock.ALL_ACTIVE_STOCKS, timeElapsed, connectionInfo);
 
     } catch (Exception e) {
-      e.printStackTrace();
       log.error("Failed to fetch data for stock symbol. {}", e.getMessage());
+      log.trace("Failed to fetch data for stock symbol. {}", e);
       throw e;
     }
 
@@ -140,8 +142,8 @@ public class StockInfoController extends BaseController {
         Stock.APP_USER_FAV_STOCKS, timeElapsed, connectionInfo);
 
     } catch (Exception e) {
-      e.printStackTrace();
-      log.error("Failed to fetch data for stock symbol. {}", e.getMessage());
+      log.error("Failed to fetch data for stock symbol. Message: {}", e.getMessage());
+      log.trace("Failed to fetch data for stock symbol. Message: {}", e);
       throw e;
     }
 
