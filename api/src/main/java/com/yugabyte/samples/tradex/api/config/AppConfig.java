@@ -7,6 +7,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.StreamSupport;
 import javax.net.ssl.SSLContext;
 import lombok.extern.slf4j.Slf4j;
@@ -88,7 +89,8 @@ public class AppConfig {
       .forEach(prop -> {
         var value = env.getProperty(prop);
         if (prop.toLowerCase().matches(".*(?:cred|secret|password|passwd|token|key).*")){
-          value = value.replaceAll(".", "#");
+          value = Objects.requireNonNull(value)
+            .replaceAll(".", "#");
         }
         log.info("{}: {}", prop, value);
       });
