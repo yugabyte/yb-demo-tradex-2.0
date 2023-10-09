@@ -96,7 +96,7 @@ public class StartupTask implements CommandLineRunner {
       //load Stock Cache
 
     } catch (ApplicationServiceException e) {
-      e.printStackTrace();
+      log.error("Error in initializing ref data", e);
     }
   }
 
