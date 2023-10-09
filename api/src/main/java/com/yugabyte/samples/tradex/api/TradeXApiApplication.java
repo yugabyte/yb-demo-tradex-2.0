@@ -20,7 +20,6 @@ import static java.lang.String.join;
         info = @Info(title = "TradeX API", version = "1.0", description = "Trading API")
 )
 public class TradeXApiApplication {
-    @Autowired
     public TradeXApiApplication(Environment environment) {
         log.info("Active profiles: [{}]", join(",", environment.getActiveProfiles()));
     }
