@@ -1,5 +1,7 @@
 package com.yugabyte.samples.tradex.api.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yugabyte.samples.tradex.api.service.AppUserRowMapper;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -90,6 +92,15 @@ public class AppConfig {
         }
         log.info("{}: {}", prop, value);
       });
+  }
+
+  @Bean
+  public ObjectMapper applicationObjectMapper(){
+      return new ObjectMapper();
+  }
+  @Bean
+  public AppUserRowMapper appUserRowMapper(){
+      return new AppUserRowMapper(applicationObjectMapper());
   }
 
 }
