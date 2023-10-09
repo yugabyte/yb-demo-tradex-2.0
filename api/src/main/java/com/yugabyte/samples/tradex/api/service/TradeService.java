@@ -89,7 +89,7 @@ public class TradeService {
           t.setStockUnits(rs.getDouble("stock_units"));
           return t;
         } catch (NullPointerException e) {
-          e.printStackTrace();
+          log.error("Missing value", e);
           throw e;
         }
       });
