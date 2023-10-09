@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -25,8 +24,11 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 public class StockRepo {
 
-  @Autowired
-  TradeXJdbcTemplateResolver resolver;
+  private final TradeXJdbcTemplateResolver resolver;
+
+  public StockRepo(TradeXJdbcTemplateResolver resolver) {
+    this.resolver = resolver;
+  }
 
   public List<TradeXStock> getAllActiveTradeXStocks(TradeXDataSourceType dbType) {
     NamedParameterJdbcTemplate template = resolver.resolve(dbType);
@@ -35,15 +37,15 @@ public class StockRepo {
 
   public TradeXStock getTradeXStock(TradeXDataSourceType dbType, String symbol) {
     NamedParameterJdbcTemplate template = resolver.resolve(dbType);
-    return template.queryForObject(Stock.STOCK_BY_SYMBOL_SQL,
-      Map.of("psymbol", symbol), new TradeXStockRowMapper());
+    return template.queryForObject(Stock.STOCK_BY_SYMBOL_SQL, Map.of("psymbol", symbol),
+      new TradeXStockRowMapper());
   }
 
   public TradeXStock getStockSymbol(TradeXDataSourceType dbType, int symbolId) {
     NamedParameterJdbcTemplate template = resolver.resolve(dbType);
     try {
-      return template.queryForObject(Stock.STOCK_BY_ID_SQL,
-        Map.of("symbolId", symbolId), new TradeXStockRowMapper());
+      return template.queryForObject(Stock.STOCK_BY_ID_SQL, Map.of("symbolId", symbolId),
+        new TradeXStockRowMapper());
     } catch (EmptyResultDataAccessException e) {
       log.error("No data for symbol id:{}", symbolId);
       throw e;
@@ -83,8 +85,7 @@ public class StockRepo {
       TradeXDataSourceType.SINGLE_REGION_MULTI_ZONE);
 
     try {
-      return template.query(Stock.STOCK_TREND,
-        Collections.emptyMap(), new TrendCacheRowMapper());
+      return template.query(Stock.STOCK_TREND, Collections.emptyMap(), new TrendCacheRowMapper());
 
     } catch (EmptyResultDataAccessException e) {
       log.error("Stock Trend Data is missing");
@@ -152,6 +153,6 @@ class TrendCacheRowMapper implements RowMapper<Pair<Integer, List<Double>>> {
       .map(Double::valueOf)
       .collect(Collectors.toList());
 
-        return Pair.of(stockId, trend);
-    }
+    return Pair.of(stockId, trend);
+  }
 }
