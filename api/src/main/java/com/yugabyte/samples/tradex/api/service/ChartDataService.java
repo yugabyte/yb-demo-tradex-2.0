@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,15 +30,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ChartDataService {
 
-  final String HOUR_LABEL = "HH:MM";
-  final DateTimeFormatter HOUR_LABEL_FORMATTER = DateTimeFormatter.ofPattern(HOUR_LABEL)
+  private static final String HOUR_LABEL = "HH:MM";
+  private static final DateTimeFormatter HOUR_LABEL_FORMATTER = DateTimeFormatter.ofPattern(HOUR_LABEL)
     .withZone(ZoneId.systemDefault());
-  @Autowired
-  ChartRepo chartRepo;
-  @Autowired
-  ConnectionInfoRepo connectionInfoRepo;
-  @Autowired
-  QueryStatsProvider queryStatsProvider;
+  private final ChartRepo chartRepo;
+  private final ConnectionInfoRepo connectionInfoRepo;
+  private final QueryStatsProvider queryStatsProvider;
+
+  public ChartDataService(ChartRepo chartRepo, ConnectionInfoRepo connectionInfoRepo,
+    QueryStatsProvider queryStatsProvider) {
+    this.chartRepo = chartRepo;
+    this.connectionInfoRepo = connectionInfoRepo;
+    this.queryStatsProvider = queryStatsProvider;
+  }
 
   @Transactional
   public DBOperationResult fetchPortfolioChart(TradeXDataSourceType dbType, AppUserId appUserId,
