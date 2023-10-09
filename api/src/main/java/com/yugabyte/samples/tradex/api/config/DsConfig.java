@@ -7,7 +7,10 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -15,6 +18,31 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 @Configuration
 @Slf4j
 public class DsConfig {
+
+  @Bean
+  @Profile("SR & yugabyte")
+  @ConfigurationProperties("spring.datasource.sr")
+  public DataSourceProperties srDataSourceProperties() {
+    return new DataSourceProperties();
+  }
+  @Bean
+  @Profile("SR & yugabyte")
+  public DataSource srDataSource() {
+    return srDataSourceProperties()
+      .initializeDataSourceBuilder()
+      .build();
+  }
+
+  @Bean
+  @Profile("SR & yugabyte")
+  @Qualifier("SINGLE_DB_TEMPLATE")
+  @Order(Ordered.HIGHEST_PRECEDENCE)
+  @Primary
+  public NamedParameterJdbcTemplate srJdbcTemplate() {
+    return new NamedParameterJdbcTemplate(srDataSource());
+  }
+
+
   @Bean
   @Profile("MR & yugabyte")
   @ConfigurationProperties("spring.datasource.mr")
@@ -32,6 +60,7 @@ public class DsConfig {
   @Bean
   @Profile("MR & yugabyte")
   @Qualifier("MULTI_REGION_DB_TEMPLATE")
+  @Order(Ordered.HIGHEST_PRECEDENCE + 2)
   public NamedParameterJdbcTemplate mrJdbcTemplate() {
     return new NamedParameterJdbcTemplate(mrDataSource());
   }
@@ -54,29 +83,9 @@ public class DsConfig {
   @Bean
   @Profile("MRRR & yugabyte")
   @Qualifier("MULTI_REGION_READ_REPLICA_DB_TEMPLATE")
+  @Order(Ordered.HIGHEST_PRECEDENCE + 2)
   public NamedParameterJdbcTemplate mrrrJdbcTemplate() {
-    return new NamedParameterJdbcTemplate(mrDataSource());
-  }
-
-  @Bean
-  @Profile("SR & yugabyte")
-  @ConfigurationProperties("spring.datasource.sr")
-  public DataSourceProperties srDataSourceProperties() {
-    return new DataSourceProperties();
-  }
-  @Bean
-  @Profile("SR & yugabyte")
-  public DataSource srDataSource() {
-    return srDataSourceProperties()
-      .initializeDataSourceBuilder()
-      .build();
-  }
-
-  @Bean
-  @Profile("SR & yugabyte")
-  @Qualifier("MULTI_REGION_READ_REPLICA_DB_TEMPLATE")
-  public NamedParameterJdbcTemplate srJdbcTemplate() {
-    return new NamedParameterJdbcTemplate(mrDataSource());
+    return new NamedParameterJdbcTemplate(mrrrDataSource());
   }
 
 
@@ -96,9 +105,10 @@ public class DsConfig {
 
   @Bean
   @Profile("GEO & yugabyte")
-  @Qualifier("MULTI_REGION_READ_REPLICA_DB_TEMPLATE")
+  @Qualifier("GEO_PARTITIONED_DB_TEMPLATE")
+  @Order(Ordered.HIGHEST_PRECEDENCE + 4)
   public NamedParameterJdbcTemplate geoJdbcTemplate() {
-    return new NamedParameterJdbcTemplate(mrDataSource());
+    return new NamedParameterJdbcTemplate(geoDataSource());
   }
 
   @Bean
@@ -118,8 +128,9 @@ public class DsConfig {
   @Bean
   @Profile("SR & oracle")
   @Qualifier("MULTI_REGION_READ_REPLICA_DB_TEMPLATE")
+  @Order(Ordered.HIGHEST_PRECEDENCE + 5)
   public NamedParameterJdbcTemplate srOraJdbcTemplate() {
-    return new NamedParameterJdbcTemplate(mrDataSource());
+    return new NamedParameterJdbcTemplate(srOraDataSource());
   }
 
 }
