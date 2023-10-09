@@ -7,7 +7,6 @@ import com.yugabyte.samples.tradex.api.domain.business.Portfolio;
 import com.yugabyte.samples.tradex.api.domain.business.UserNotifications;
 import com.yugabyte.samples.tradex.api.domain.db.AppUser;
 import com.yugabyte.samples.tradex.api.domain.repo.ConnectionInfoRepo;
-import com.yugabyte.samples.tradex.api.service.ApplicationServiceException;
 import com.yugabyte.samples.tradex.api.service.DBOperationResult;
 import com.yugabyte.samples.tradex.api.service.PortfolioService;
 import com.yugabyte.samples.tradex.api.service.UserService;
