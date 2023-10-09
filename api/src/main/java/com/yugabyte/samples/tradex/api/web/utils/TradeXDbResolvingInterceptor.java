@@ -1,13 +1,11 @@
 package com.yugabyte.samples.tradex.api.web.utils;
 
 import com.yugabyte.samples.tradex.api.config.TradeXDataSourceType;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.core.ApplicationContext;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.servlet.HandlerInterceptor;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
 public class TradeXDbResolvingInterceptor implements HandlerInterceptor {
