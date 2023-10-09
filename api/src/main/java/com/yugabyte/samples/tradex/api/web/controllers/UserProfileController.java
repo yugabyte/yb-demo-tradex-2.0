@@ -12,6 +12,7 @@ import com.yugabyte.samples.tradex.api.service.PortfolioService;
 import com.yugabyte.samples.tradex.api.service.UserService;
 import com.yugabyte.samples.tradex.api.utils.AppUserParamUtils;
 import com.yugabyte.samples.tradex.api.utils.QueryStatsProvider;
+import com.yugabyte.samples.tradex.api.utils.Sql.User;
 import com.yugabyte.samples.tradex.api.web.dto.ConnectionInfo;
 import com.yugabyte.samples.tradex.api.web.dto.VerifyPinRequest;
 import com.yugabyte.samples.tradex.api.web.utils.TradeXDBTypeContext;
@@ -28,8 +29,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.yugabyte.samples.tradex.api.utils.SqlQueries.UserSql.*;
 
 @RestController
 @Slf4j
@@ -64,7 +63,7 @@ public class UserProfileController extends BaseController {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("pEmail", user.getEmail());
 
-        return enhancer.loadUserQueryStats(dbType, user, inspectQueries, parameters, FIND_BY_EMAIL_SQL, timeElapsed, connectionInfo);
+        return enhancer.loadQueryStats(dbType, user, inspectQueries, parameters, User.FIND_BY_EMAIL_SQL, timeElapsed, connectionInfo);
 
     }
 
@@ -104,8 +103,8 @@ public class UserProfileController extends BaseController {
         parameters.addValue("pUserPin", verifyPinRequest.getPin());
         parameters.addValue("prefRegion", appUserFromDB.getId().getPreferredRegion());
 
-        return enhancer.loadUserQueryStats(dbType, data, inspectQueries, parameters,
-                VERIFY_USE_PIN_SQL, timeElapsed, connectionInfo);
+        return enhancer.loadQueryStats(dbType, data, inspectQueries, parameters,
+                User.VERIFY_USE_PIN_SQL, timeElapsed, connectionInfo);
     }
 
 
@@ -126,7 +125,7 @@ public class UserProfileController extends BaseController {
         MapSqlParameterSource params = paramUtils.getSQLParams(appUser,
                 appUserFromDB.getId().getPreferredRegion());
 
-        return enhancer.updateQueryStats(result, dbType, inspectQueries, INSERT_APP_USER,
+        return enhancer.updateQueryStats(result, dbType, inspectQueries, User.INSERT_APP_USER,
                 params, timeElapsed, connectionInfo);
     }
 
@@ -148,7 +147,7 @@ public class UserProfileController extends BaseController {
                 appUserFromDB.getId().getPreferredRegion());
         params.addValue("uid", appUser.getId().getId());
 
-        return enhancer.updateQueryStats(result, dbType, inspectQueries, UPDATE_APP_USER,
+        return enhancer.updateQueryStats(result, dbType, inspectQueries, User.UPDATE_APP_USER,
                 params, timeElapsed, connectionInfo);
     }
 
@@ -192,7 +191,7 @@ public class UserProfileController extends BaseController {
 
         long timeElapsed = Duration.between(start, Instant.now()).toMillis();
 
-        return enhancer.updateQueryStats(result, dbType, inspectQueries, UPDATE_USER_FAV,
+        return enhancer.updateQueryStats(result, dbType, inspectQueries, User.UPDATE_USER_FAV,
                 params, timeElapsed, connectionInfo);
     }
 
@@ -221,7 +220,7 @@ public class UserProfileController extends BaseController {
             throw new IllegalArgumentException("failed to parse either personal details or notifications");
         }
 
-        return enhancer.updateQueryStats(result, dbType, inspectQueries, UPDATE_USER_NOTIF,
+        return enhancer.updateQueryStats(result, dbType, inspectQueries, User.UPDATE_USER_NOTIF,
                 params, timeElapsed, connectionInfo);
     }
 
@@ -245,7 +244,7 @@ public class UserProfileController extends BaseController {
         params.addValue("prefRegion", appUser.getId().getPreferredRegion());
         params.addValue("langCode", langCode);
 
-        return enhancer.updateQueryStats(result, dbType, inspectQueries, UPDATE_USER_NOTIF,
+        return enhancer.updateQueryStats(result, dbType, inspectQueries, User.UPDATE_USER_NOTIF,
                 params, timeElapsed, connectionInfo);
 
     }
