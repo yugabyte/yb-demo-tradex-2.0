@@ -60,8 +60,7 @@ public class UserProfileController extends BaseController {
   @GetMapping("/api/me")
   @SecurityRequirement(name = "auth-header-bearer")
   public DBOperationResult getUser(Authentication authentication,
-    @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER, required = false, defaultValue = "false") Boolean inspectQueries)
-    throws ApplicationServiceException {
+    @RequestHeader(value = WebConstants.TRADEX_QUERY_ANALYZE_HEADER, required = false, defaultValue = "false") Boolean inspectQueries) {
     Instant start = Instant.now();
     TradeXDataSourceType dbType = tradeXDBTypeContext.getDbType();
 
@@ -83,8 +82,8 @@ public class UserProfileController extends BaseController {
   @GetMapping("/api/portfolio")
   @SecurityRequirement(name = "auth-header-bearer")
   public Portfolio getMyPortfolio(
-    @RequestParam(name = "prevId", required = false, defaultValue = "0") int prevId,
-    @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
+//    @RequestParam(name = "prevId", required = false, defaultValue = "0") int prevId,
+//    @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
     Authentication authentication) {
 
     AppUser user = fetchUser(authentication);
