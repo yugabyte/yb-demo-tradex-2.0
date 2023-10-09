@@ -1,18 +1,16 @@
 package com.yugabyte.samples.tradex.api;
 
+import static java.lang.String.join;
+
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import java.util.TimeZone;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.core.env.Environment;
-
-import javax.annotation.PostConstruct;
-import java.util.TimeZone;
-
-import static java.lang.String.join;
 
 @SpringBootApplication(scanBasePackages = "com.yugabyte.samples.tradex.api", exclude = DataSourceAutoConfiguration.class)
 @Slf4j
