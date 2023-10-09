@@ -38,8 +38,6 @@ ysqlsh -h $YB_HOST -d tradex_sr  -f data.sql
 ysqlsh -h $YB_HOST -d tradex_mr  -f drop.sql
 ysqlsh -h $YB_HOST -d tradex_mr  -f schema.sql
 ysqlsh -h $YB_HOST -d tradex_mr  -f views.sql
-ysqlsh -h $YB_HOST -d tradex_mr  -f schema-geo-part-tablespace.sql
-ysqlsh -h $YB_HOST -d tradex_mr  -f schema-geo-part.sql
 ysqlsh -h $YB_HOST -d tradex_mr  -f data.sql
 
 # MRRR
