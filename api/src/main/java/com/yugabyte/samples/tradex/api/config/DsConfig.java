@@ -1,5 +1,13 @@
 package com.yugabyte.samples.tradex.api.config;
 
+import static com.yugabyte.samples.tradex.api.config.TradeXDataSourceType.GEO_PARTITIONED;
+import static com.yugabyte.samples.tradex.api.config.TradeXDataSourceType.MULTI_REGION_MULTI_ZONE;
+import static com.yugabyte.samples.tradex.api.config.TradeXDataSourceType.MULTI_REGION_READ_REPLICA;
+import static com.yugabyte.samples.tradex.api.config.TradeXDataSourceType.SINGLE_REGION_MULTI_ZONE;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,11 +31,11 @@ public class DsConfig {
   public DataSourceProperties srDataSourceProperties() {
     return new DataSourceProperties();
   }
+
   @Bean
   @Profile("SR & yugabyte")
   public DataSource srDataSource() {
-    return srDataSourceProperties()
-      .initializeDataSourceBuilder()
+    return srDataSourceProperties().initializeDataSourceBuilder()
       .build();
   }
 
@@ -47,11 +55,11 @@ public class DsConfig {
   public DataSourceProperties mrDataSourceProperties() {
     return new DataSourceProperties();
   }
+
   @Bean
   @Profile("MR & yugabyte")
   public DataSource mrDataSource() {
-    return mrDataSourceProperties()
-      .initializeDataSourceBuilder()
+    return mrDataSourceProperties().initializeDataSourceBuilder()
       .build();
   }
 
@@ -70,11 +78,11 @@ public class DsConfig {
   public DataSourceProperties mrrrDataSourceProperties() {
     return new DataSourceProperties();
   }
+
   @Bean
   @Profile("MRRR & yugabyte")
   public DataSource mrrrDataSource() {
-    return mrrrDataSourceProperties()
-      .initializeDataSourceBuilder()
+    return mrrrDataSourceProperties().initializeDataSourceBuilder()
       .build();
   }
 
@@ -93,11 +101,11 @@ public class DsConfig {
   public DataSourceProperties geoDataSourceProperties() {
     return new DataSourceProperties();
   }
+
   @Bean
   @Profile("GEO & yugabyte")
   public DataSource geoDataSource() {
-    return geoDataSourceProperties()
-      .initializeDataSourceBuilder()
+    return geoDataSourceProperties().initializeDataSourceBuilder()
       .build();
   }
 
@@ -115,11 +123,11 @@ public class DsConfig {
   public DataSourceProperties srOraDataSourceProperties() {
     return new DataSourceProperties();
   }
+
   @Bean
   @Profile("SR & oracle")
   public DataSource srOraDataSource() {
-    return srOraDataSourceProperties()
-      .initializeDataSourceBuilder()
+    return srOraDataSourceProperties().initializeDataSourceBuilder()
       .build();
   }
 
@@ -131,5 +139,21 @@ public class DsConfig {
     return new NamedParameterJdbcTemplate(srOraDataSource());
   }
 
+  @Bean
+  public TradeXDataSourceType[] availableDataSourceTypes(List<DataSource> dataSources) {
+    Set<TradeXDataSourceType> types = new HashSet<>(dataSources.size());
+    for (DataSource ds : dataSources) {
+      if (ds == geoDataSource()) {
+        types.add(GEO_PARTITIONED);
+      } else if (ds == mrDataSource()) {
+        types.add(MULTI_REGION_MULTI_ZONE);
+      } else if (ds == srDataSource()) {
+        types.add(SINGLE_REGION_MULTI_ZONE);
+      } else if (ds == mrrrDataSource()) {
+        types.add(MULTI_REGION_READ_REPLICA);
+      }
+    }
+    return types.toArray(new TradeXDataSourceType[0]);
+  }
 }
 
