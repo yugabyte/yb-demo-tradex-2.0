@@ -2,7 +2,6 @@ package com.yugabyte.samples.tradex.api.utils;
 
 import com.yugabyte.samples.tradex.api.config.TradeXDataSourceType;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -18,18 +17,19 @@ public class TradeXJdbcTemplateResolver {
 
   private final NamedParameterJdbcTemplate geoDbJdbcTemplate;
 
-  @Value("${app.datasource_types}")
-  private TradeXDataSourceType[] tradeXInputDataSourceTypes;
+  private final TradeXDataSourceType[] tradeXInputDataSourceTypes;
 
   public TradeXJdbcTemplateResolver(
     @Qualifier("SINGLE_DB_TEMPLATE") NamedParameterJdbcTemplate singleDbJdbcTemplate,
     @Qualifier("MULTI_REGION_DB_TEMPLATE") NamedParameterJdbcTemplate multiRegionTemplate,
     @Qualifier("MULTI_REGION_READ_REPLICA_DB_TEMPLATE") NamedParameterJdbcTemplate multiRegionReplicaTemplate,
-    @Qualifier("GEO_PARTITIONED_DB_TEMPLATE") NamedParameterJdbcTemplate geoDbJdbcTemplate) {
+    @Qualifier("GEO_PARTITIONED_DB_TEMPLATE") NamedParameterJdbcTemplate geoDbJdbcTemplate,
+    TradeXDataSourceType[] tradeXInputDataSourceTypes) {
     this.singleDbJdbcTemplate = singleDbJdbcTemplate;
     this.multiRegionTemplate = multiRegionTemplate;
     this.multiRegionReplicaTemplate = multiRegionReplicaTemplate;
     this.geoDbJdbcTemplate = geoDbJdbcTemplate;
+    this.tradeXInputDataSourceTypes = tradeXInputDataSourceTypes;
   }
 
 
