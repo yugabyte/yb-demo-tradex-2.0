@@ -9,7 +9,6 @@ app:
   load_mock_data: ${APP_LOAD_MOCK_DATA:true}
   load_balance: ${APP_DB_LOADBALANCE:true}
   mylocation: ${APP_INSTANCE_LOCATION:WASHINGTON}
-  datasource_types: ${DATASOURCE_TYPES:SINGLE_REGION_MULTI_ZONE}
   security:
     jwt:
       secret: cccccclvkgnllrhrngucjbivrehvjcnkfvfihildhfcg
@@ -109,9 +108,6 @@ spring:
           additionalEndpoints: 127.0.0.2:5433,127.0.0.3:5433
           topologyKeys: "cloud1.datacenter1.rack1"
 
-app:
-  datasource_types: SINGLE_REGION_MULTI_ZONE
-
 ---
 spring:
   config:
@@ -131,7 +127,6 @@ spring:
           additionalEndpoints: 127.0.0.2:5433,127.0.0.3:5433,127.0.0.4:5433
           topologyKeys: "aws.us-east-1.*,aws.us-east-2.*"
 app:
-  datasource_types: MULTI_REGION_MULTI_ZONE
   mylocation: BOSTON
 ---
 spring:
@@ -171,7 +166,6 @@ spring:
           additionalEndpoints: 127.0.0.2:5433,127.0.0.3:5433,127.0.0.4:5433
           topologyKeys: "aws.us-east-1.*,aws.us-east-2.*"
 app:
-  datasource_types: GEO_PARTITIONED
   mylocation: BOSTON
 ---
 spring:
@@ -218,3 +212,10 @@ spring:
   config:
     activate:
       on-profile: SR & oracle
+---
+spring:
+  config:
+    activate:
+      on-profile: yugabyte & devtools
+app:
+  load_mock_data: true
