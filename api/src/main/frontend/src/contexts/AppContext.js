@@ -24,14 +24,14 @@ export function AppProvider({ children }) {
 
   const [showExecutionPlan, setShowExecutionPlan] = useState(
     localStorage.hasOwnProperty("showExecPlan")? localStorage.getItem("showExecPlan"):false
-  );  
+  );
   const [databases, setDatabases] = useState([]);
   const [databaseNodes, setDatabaseNodes] = useState({});
 
   const getDatabases = async () => {
     try {
       const db = await getJSON("/api/refdata/dbtypes");
-      
+
       setDatabases(db);
       return Promise.resolve();
     } catch (e) {
@@ -44,7 +44,7 @@ export function AppProvider({ children }) {
 
       //const json = await getJSON(`/${trafficLocation}/trafficLocations`);
       const json = await getJSON('/api/refdata/trafficLoc');
-      console.log('trafficLocations', json)
+      // console.log('trafficLocations', json)
       setTrafficLocations(json);
       return Promise.resolve();
     } catch (e) {
@@ -53,7 +53,7 @@ export function AppProvider({ children }) {
   };
 
   const initialize = async () => {
-    console.log("Initializing traffic locations and databases");
+    // console.log("Initializing traffic locations and databases");
     await Promise.all([getTrafficLocations(), getDatabases()]);
     setLoading(false);
   };
@@ -77,7 +77,7 @@ export function AppProvider({ children }) {
       const bestNodeIndex = resp.findIndex((node) => node.id === bestNode.id);
 
 
-      const nodes = resp;      
+      const nodes = resp;
       const isReplicaNode =
         resp[0].nodeType === "replica";
       setDatabaseNodes({
@@ -106,7 +106,7 @@ export function AppProvider({ children }) {
     });
   };
 
-  
+
   return (
     <AppContext.Provider
       value={{
