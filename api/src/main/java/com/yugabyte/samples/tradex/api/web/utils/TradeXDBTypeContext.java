@@ -2,7 +2,6 @@ package com.yugabyte.samples.tradex.api.web.utils;
 
 import com.yugabyte.samples.tradex.api.config.TradeXDataSourceType;
 import javax.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -11,13 +10,13 @@ import org.springframework.web.context.annotation.RequestScope;
 public class TradeXDBTypeContext {
 
 
-  @Value("${app.datasource_types}")
-  TradeXDataSourceType[] dbTypes;
+
+  private final TradeXDataSourceType[] dbTypes;
 
   TradeXDataSourceType dbType;
 
-  @PostConstruct
-  public void init(){
+  public TradeXDBTypeContext(TradeXDataSourceType[] dbTypes) {
+    this.dbTypes = dbTypes;
     this.dbType = dbTypes[0];
   }
 
