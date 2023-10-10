@@ -35,16 +35,18 @@ public class StartupTask implements CommandLineRunner {
   @Value("${app.mylocation}")
   String location;
 
-  @Value("${app.datasource_types}")
-  TradeXDataSourceType[] tradeXInputDataSourceTypes;
+
+  private final TradeXDataSourceType[] tradeXInputDataSourceTypes;
 
   public StartupTask(RefDataService refDataService, StockInfoService stockInfoService,
-    TradeService tradeService, NamedParameterJdbcTemplate jdbcTemplate, TradesGenerator generator) {
+    TradeService tradeService, NamedParameterJdbcTemplate jdbcTemplate, TradesGenerator generator,
+    TradeXDataSourceType[] tradeXInputDataSourceTypes) {
     this.refDataService = refDataService;
     this.stockInfoService = stockInfoService;
     this.tradeService = tradeService;
     this.jdbcTemplate = jdbcTemplate;
     this.generator = generator;
+    this.tradeXInputDataSourceTypes = tradeXInputDataSourceTypes;
   }
 
   @Override
@@ -60,6 +62,7 @@ public class StartupTask implements CommandLineRunner {
         log.info("Loading metadata - begin");
         stockInfoService.loadStockPerformance(false);
         for (TradeXDataSourceType t : tradeXInputDataSourceTypes) {
+          log.info("Load Mock Data for : {}", t);
           refDataService.getDBNodes(t);
           refDataService.getDbClusterTypes(t);
           refDataService.getTrafficLocations(t);
